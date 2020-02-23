@@ -1,0 +1,5 @@
+def libs = rootProject.ext.libraries
+
+dependencies {
+    implementation "org.apache.curator:curator-recipes:${libs.curator}"
+}
