@@ -12,6 +12,10 @@ import java.util.List;
  */
 public class ZookeeperRegistry extends AbstractRegistry {
 
+    public ZookeeperRegistry(URL url) {
+        super(url);
+    }
+
     @Override
     public void register(URL url) {
 
@@ -33,7 +37,13 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
+    protected void doConnect() {
+
+    }
+
+    @Override
     protected void doDestroy() {
 
     }
+
 }

@@ -1,4 +1,4 @@
 rootProject.name = 'hamal'
-
 include 'core'
-include 'registry'
+include 'regsitry'
+

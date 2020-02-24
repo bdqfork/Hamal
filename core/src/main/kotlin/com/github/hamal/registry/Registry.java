@@ -1,5 +1,6 @@
 package com.github.hamal.registry;
 
+import com.github.hamal.Node;
 import com.github.hamal.URL;
 import com.github.hamal.extension.SPI;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @since 2020/2/23
  */
 @SPI
-public interface Registry {
+public interface Registry extends Node {
 
     /**
      * 注册服务
@@ -42,15 +43,4 @@ public interface Registry {
      */
     List<URL> lookup(URL url);
 
-    /**
-     * 检测是否可获取
-     *
-     * @return 是否可获取
-     */
-    boolean isAvailable();
-
-    /**
-     * 关闭注册中心
-     */
-    void destroy();
 }

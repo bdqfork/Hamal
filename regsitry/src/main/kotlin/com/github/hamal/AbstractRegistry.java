@@ -12,6 +12,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractRegistry implements Registry {
     protected volatile boolean available;
     protected AtomicBoolean destroyed = new AtomicBoolean(false);
+    private URL url;
+
+    public AbstractRegistry(URL url) {
+        this.url = url;
+        doConnect();
+    }
+
+    protected abstract void doConnect();
 
     @Override
     public boolean isAvailable() {
@@ -28,4 +36,8 @@ public abstract class AbstractRegistry implements Registry {
 
     protected abstract void doDestroy();
 
+    @Override
+    public URL getUrl() {
+        return url;
+    }
 }

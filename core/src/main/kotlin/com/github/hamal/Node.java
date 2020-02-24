@@ -5,6 +5,7 @@ package com.github.hamal;
  * @since 2020/2/23
  */
 public interface Node {
+    
     URL getUrl();
 
     boolean isAvailable();
