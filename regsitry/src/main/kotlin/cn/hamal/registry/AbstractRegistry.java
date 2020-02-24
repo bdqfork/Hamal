@@ -1,7 +1,8 @@
-package com.github.hamal;
+package cn.hamal.registry;
 
 
-import com.github.hamal.registry.Registry;
+import cn.hamal.core.URL;
+import cn.hamal.core.registry.Registry;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

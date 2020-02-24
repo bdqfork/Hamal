@@ -1,8 +1,8 @@
-package com.github.hamal.registry;
+package cn.hamal.core.registry;
 
-import com.github.hamal.Node;
-import com.github.hamal.URL;
-import com.github.hamal.extension.SPI;
+import cn.hamal.core.Node;
+import cn.hamal.core.URL;
+import cn.hamal.core.extension.SPI;
 
 import java.util.List;
 

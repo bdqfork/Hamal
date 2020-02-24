@@ -1,4 +1,4 @@
-package com.github.hamal.extension;
+package cn.hamal.core.extension;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -81,7 +81,7 @@ public class ExtensionLoader<T> {
     public Map<String, T> getExtensions() {
         if (cacheExtensions == null) {
             cacheExtensions = new ConcurrentHashMap<>();
-            getExtensionClasses();
+            loadExtensionClasses();
 
             for (Map.Entry<String, Class<T>> entry : extensionClasses.entrySet()) {
                 Class<T> clazz = entry.getValue();
@@ -98,8 +98,8 @@ public class ExtensionLoader<T> {
         return Collections.unmodifiableMap(cacheExtensions);
     }
 
-    private void getExtensionClasses() {
-        if (classNames.size() > 0 && classNames.size() > 0) {
+    private void loadExtensionClasses() {
+        if (classNames.size() > 0) {
             return;
         }
         try {

@@ -1,4 +1,4 @@
-package com.github.hamal.extension;
+package cn.hamal.core.extension;
 
 import java.lang.annotation.*;
 

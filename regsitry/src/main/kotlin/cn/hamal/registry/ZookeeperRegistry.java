@@ -1,6 +1,7 @@
-package com.github.hamal;
+package cn.hamal.registry;
 
-import com.github.hamal.registry.Notifier;
+import cn.hamal.core.URL;
+import cn.hamal.core.registry.Notifier;
 
 import java.util.List;
 

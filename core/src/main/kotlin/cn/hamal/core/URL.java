@@ -1,4 +1,4 @@
-package com.github.hamal;
+package cn.hamal.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class URL implements Serializable {
     /**
-     * 服务协议,consumer或者provider
+     * 服务协议
      */
     private String protocol;
     /**
@@ -39,8 +39,17 @@ public class URL implements Serializable {
         this.path = path;
     }
 
+    public void addParam(String key, Object value) {
+        this.params.put(key, value);
+    }
+
     public void addParams(Map<String, Object> params) {
         this.params.putAll(params);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getParam(String key) {
+        return (T) params.get(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -70,4 +79,5 @@ public class URL implements Serializable {
     public String getPath() {
         return path;
     }
+
 }

@@ -1,6 +1,6 @@
-package com.github.hamal.registry;
+package cn.hamal.core.registry;
 
-import com.github.hamal.URL;
+import cn.hamal.core.URL;
 
 import java.util.List;
 

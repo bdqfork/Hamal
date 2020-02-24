@@ -1,4 +1,4 @@
-package com.github.hamal;
+package cn.hamal.core;
 
 /**
  * @author bdq

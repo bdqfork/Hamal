@@ -1,8 +1,6 @@
-package com.github.hamal;
+package cn.hamal.core;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ZookeeperRegistryTest {
 
