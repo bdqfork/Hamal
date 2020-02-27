@@ -25,7 +25,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
         MethodInvocation methodInvocation = (MethodInvocation) request.getPayload();
 
-        Invoker invoker = serviceContainer.get(methodInvocation.getInterfaceName());
+        Invoker<?> invoker = serviceContainer.get(methodInvocation.getInterfaceName());
         try {
             Object result = invoker.invoke(methodInvocation);
             response.setPayload(result);

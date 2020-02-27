@@ -4,12 +4,17 @@ package cn.hamal.rpc;
 import cn.hamal.core.Node;
 
 /**
+ * 执行服务的接口
+ *
  * @author bdq
  * @since 2020/2/25
  */
 public interface Invoker<T> extends Node {
-
+    /**
+     * 服务接口
+     */
     Class<T> getInterface();
+
     /**
      * 执行服务调用
      *
