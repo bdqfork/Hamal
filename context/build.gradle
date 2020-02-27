@@ -1,0 +1,9 @@
+apply plugin: 'java-library'
+
+dependencies {
+    api project(":protocol")
+    api project(":registry")
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'

@@ -1,4 +1,15 @@
 rootProject.name = 'hamal'
+
+include 'rpc'
 include 'core'
-include 'regsitry'
+include 'registry'
+include 'protocol'
+include 'context'
+include 'example'
+include 'example:provider'
+findProject(':example:provider')?.name = 'provider'
+include 'example:consumer'
+findProject(':example:consumer')?.name = 'consumer'
+include 'example:api'
+findProject(':example:api')?.name = 'api'
 

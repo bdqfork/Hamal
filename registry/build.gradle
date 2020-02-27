@@ -1,0 +1,8 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation project(":rpc")
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'

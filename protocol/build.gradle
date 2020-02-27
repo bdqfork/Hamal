@@ -1,0 +1,11 @@
+apply plugin: 'java-library'
+
+def libs = rootProject.ext.libraries
+
+dependencies {
+    implementation "io.netty:netty-all:${libs.netty}"
+    api project(":rpc")
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'

@@ -1,3 +1,19 @@
-dependencies {
+apply plugin: 'java-library'
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+def libs = rootProject.ext.libraries
+
+dependencies {
+    api "org.slf4j:slf4j-api:${libs.slf4j}"
+
+    implementation "org.javassist:javassist:${libs.javassist}"
+    implementation "com.caucho:hessian:${libs.hessian}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:${libs.junit}"
+}
+
+test {
+    useJUnitPlatform()
 }
