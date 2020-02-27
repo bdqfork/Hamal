@@ -1,6 +1,6 @@
 一个基于netty的rpc框架，使用方式可参考example
 
-fetures:
+Features:
 + 基于netty实现rpc协议
 + 支持端到端的rpc调用
 
