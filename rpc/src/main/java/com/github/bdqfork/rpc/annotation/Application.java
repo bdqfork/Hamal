@@ -52,7 +52,7 @@ public @interface Application {
     /**
      * 是否开启服务
      */
-    boolean startUp() default true;
+    boolean startUp() default false;
 
     /**
      * 指定服务容器

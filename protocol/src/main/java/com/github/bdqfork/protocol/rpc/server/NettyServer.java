@@ -59,6 +59,9 @@ public class NettyServer extends AbstractRpcServer {
             ChannelFuture future = bootstrap.bind(host, port).sync();
             channel = future.channel();
             available = true;
+            if (log.isInfoEnabled()) {
+                log.info("start rpc server at {}:{} successful!", host, port);
+            }
         } catch (Exception e) {
             destroy();
             throw e;
@@ -67,8 +70,16 @@ public class NettyServer extends AbstractRpcServer {
 
     @Override
     protected void doDestroy() {
-        channel.close();
-        workerGroup.shutdownGracefully();
-        bossGroup.shutdownGracefully();
+        try {
+            channel.close().sync();
+            bossGroup.shutdownGracefully().sync();
+            workerGroup.shutdownGracefully().sync();
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+
+        if (log.isInfoEnabled()) {
+            log.info("close rpc server at {}:{} successful!", host, port);
+        }
     }
 }

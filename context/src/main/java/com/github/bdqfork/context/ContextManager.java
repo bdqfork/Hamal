@@ -84,6 +84,9 @@ public class ContextManager {
         } catch (ConfilictServiceException e) {
             throw new IllegalStateException(e);
         }
+        if (log.isInfoEnabled()) {
+            log.info("register service {}!", serviceInterface.getCanonicalName());
+        }
     }
 
     public static ContextManager build(Class<?> clazz) {

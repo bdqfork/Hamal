@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author bdq
  * @since 2020/2/26
  */
-@Application(direct = true, startUp = false)
+@Application(direct = true)
 public class Main {
     public static void main(String[] args) throws Exception {
         ContextManager contextManager = ContextManager.build(Main.class);
@@ -29,7 +29,6 @@ public class Main {
                 User user = userService.getUser(1L);
                 System.out.println(user);
             });
-            Thread.sleep(2000);
         }
     }
 }

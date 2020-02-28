@@ -14,6 +14,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         ContextManager contextManager = ContextManager.build(Main.class);
         contextManager.registerService(new UserServiceImpl());
+        contextManager.open();
         CountDownLatch latch = new CountDownLatch(1);
         latch.await();
     }

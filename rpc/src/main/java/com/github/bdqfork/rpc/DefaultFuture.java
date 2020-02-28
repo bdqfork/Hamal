@@ -52,6 +52,9 @@ public class DefaultFuture extends CompletableFuture<Object> {
      * @param response 响应信息
      */
     public static void received(Response response) {
+        if (log.isDebugEnabled()) {
+            log.debug("receive response for id {}!", response.getId());
+        }
         DefaultFuture future = FUTURE_MAP.get(response.getId());
         if (future == null) {
             if (log.isWarnEnabled()) {

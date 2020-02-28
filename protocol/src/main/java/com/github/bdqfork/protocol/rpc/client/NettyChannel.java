@@ -46,7 +46,6 @@ public class NettyChannel extends AbstractChannel {
                         ch.pipeline()
                                 .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4, 14, 0))
                                 .addLast(new MessageCodec(serializer))
-                                .addLast(new ClientHandler())
                                 .addLast(new ResponseHandler());
                     }
                 });
@@ -102,7 +101,7 @@ public class NettyChannel extends AbstractChannel {
 
             return defaultFuture;
         } else {
-            throw new RpcException(future.cause().getMessage());
+            throw new RpcException(future.cause());
         }
     }
 

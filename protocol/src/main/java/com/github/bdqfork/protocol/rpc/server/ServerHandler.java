@@ -39,6 +39,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         } catch (Exception e) {
             response.setStatus(Request.ERROR);
             response.setPayload(e);
+            if (log.isErrorEnabled()) {
+                log.error(e.getMessage(), e);
+            }
         }
 
         ctx.writeAndFlush(response);
