@@ -1,8 +1,9 @@
-一个基于netty的rpc框架，使用方式可参考example
+一个基于netty的轻量级rpc框架，使用方式可参考example。
 
 Features:
 + 基于netty实现rpc协议
 + 支持端到端的rpc调用
++ 支持使用SPI进行功能扩展
 
 #### todolist:
 + 实现zookeeper注册中心
