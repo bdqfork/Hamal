@@ -30,7 +30,10 @@ public class ContextManager {
 
     public ContextManager(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
-        this.protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(applicationConfig.getProtocol());
+        this.protocol = ExtensionLoader.getExtensionLoader(Protocol.class)
+                .getExtension(applicationConfig.getProtocol());
+        this.serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class)
+                .getExtension(applicationConfig.getContainer());
     }
 
     public void open() {
@@ -89,9 +92,6 @@ public class ContextManager {
 
         ApplicationConfig applicationConfig = new ApplicationConfig(application);
         ContextManager contextManager = new ContextManager(applicationConfig);
-
-        contextManager.serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class)
-                .getExtension(application.container());
 
         if (application.startUp()) {
             contextManager.open();

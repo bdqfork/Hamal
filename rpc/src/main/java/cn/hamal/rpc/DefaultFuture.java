@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 远程调用结果的future，用来记录执行结果
+ *
  * @author bdq
  * @since 2020/2/27
  */
@@ -23,6 +25,13 @@ public class DefaultFuture extends CompletableFuture<Object> {
     private DefaultFuture() {
     }
 
+    /**
+     * 生成一个新的Future
+     *
+     * @param requestId 请求Id
+     * @param timeout   超时时间
+     * @return DefaultFuture实例
+     */
     public static DefaultFuture newDefaultFuture(Long requestId, long timeout) {
         DefaultFuture defaultFuture = new DefaultFuture();
         defaultFuture.timerTask = new TimerTask() {
@@ -37,6 +46,11 @@ public class DefaultFuture extends CompletableFuture<Object> {
         return defaultFuture;
     }
 
+    /**
+     * 接收响应信息，完成future
+     *
+     * @param response 响应信息
+     */
     public static void received(Response response) {
         DefaultFuture future = FUTURE_MAP.get(response.getId());
         if (future == null) {

@@ -6,6 +6,8 @@ import cn.hamal.core.extension.ExtensionLoader;
 import cn.hamal.core.serializer.Serializer;
 
 /**
+ * 抽象Channel
+ *
  * @author bdq
  * @since 2020/2/25
  */

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 抽象负载均衡器
+ *
  * @author bdq
  * @since 2020/2/26
  */

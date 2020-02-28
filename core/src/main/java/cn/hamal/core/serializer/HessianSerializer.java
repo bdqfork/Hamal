@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
+ * Hessian的序列化实现
+ *
  * @author bdq
  * @since 2020/2/26
  */

@@ -6,6 +6,8 @@ import cn.hamal.core.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * 抽象的注册中心，实现了基本的方法
+ *
  * @author bdq
  * @since 2020/2/23
  */

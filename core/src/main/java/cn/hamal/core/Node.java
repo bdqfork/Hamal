@@ -1,6 +1,8 @@
 package cn.hamal.core;
 
 /**
+ * 该接口用来描述节点的相关信息与状态
+ *
  * @author bdq
  * @since 2020/2/23
  */

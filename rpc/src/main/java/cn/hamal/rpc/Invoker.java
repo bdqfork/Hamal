@@ -20,7 +20,7 @@ public interface Invoker<T> extends Node {
      *
      * @param methodInvocation 服务信息
      * @return 调用结果
-     * @throws Exception 异常
+     * @throws Exception 执行失败时的异常
      */
     Object invoke(MethodInvocation methodInvocation) throws Exception;
 }

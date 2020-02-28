@@ -36,7 +36,7 @@ public abstract class Proxy implements Serializable {
      * @param classLoader ClassLoader
      * @param interfaces  代理接口
      * @param handler     InvocationHandler
-     * @return Object
+     * @return 代理实例
      * @throws IllegalArgumentException 生成失败时抛出
      */
     public static Object newProxyInstance(ClassLoader classLoader, Class<?>[] interfaces, InvocationHandler handler) throws IllegalArgumentException {
@@ -127,7 +127,7 @@ public abstract class Proxy implements Serializable {
      *
      * @param resultName 返回值名称
      * @param returnType 返回类型
-     * @return
+     * @return 类型转换语句
      */
     private static String castResult(String resultName, Class<?> returnType) {
         if (returnType.isPrimitive()) {

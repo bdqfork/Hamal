@@ -2,7 +2,6 @@ package cn.hamal.rpc.protocol.client;
 
 import cn.hamal.core.URL;
 import cn.hamal.core.constant.ProtocolProperty;
-import cn.hamal.core.constant.RequestType;
 import cn.hamal.core.extension.ExtensionLoader;
 import cn.hamal.rpc.MethodInvocation;
 import cn.hamal.rpc.Request;
@@ -53,10 +52,9 @@ public class RpcInvoker<T> implements Endpoint<T> {
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Exception {
         RpcContext rpcContext = RpcContext.getContext();
-        rpcContext.setUrl(url);
-        rpcContext.setMethodInvocation(methodInvocation);
+        rpcContext.setProvider(url);
 
-        Request request = new Request(Request.newId(), RequestType.INVOKE);
+        Request request = new Request(Request.newId());
         request.setPayload(methodInvocation);
 
         rpcContext.setRequest(request);
@@ -64,7 +62,7 @@ public class RpcInvoker<T> implements Endpoint<T> {
         Long timeout = url.getParam(ProtocolProperty.TIMEOUT, ProtocolProperty.DEFAULT_TIMEOUT);
         Object result = rpcClient.send(request, timeout);
 
-        //clear，防止内存泄漏
+        //请求结束clear，防止内存泄漏
         RpcContext.remove();
         return result;
     }

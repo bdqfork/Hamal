@@ -4,6 +4,8 @@ import cn.hamal.core.URL;
 import cn.hamal.rpc.annotation.Application;
 
 /**
+ * 应用配置类
+ *
  * @author bdq
  * @since 2020/2/26
  */
@@ -15,6 +17,7 @@ public class ApplicationConfig {
     private String serilizer;
     private boolean direct;
     private String loadbalancer;
+    private String container;
 
     public ApplicationConfig(Application application) {
         this.host = application.host();
@@ -24,6 +27,7 @@ public class ApplicationConfig {
         this.serilizer = application.serilizer();
         this.direct = application.direct();
         this.loadbalancer = application.loadbalancer();
+        this.container = application.container();
     }
 
     public ApplicationConfig(String host, Integer port, String protocol, String server) {
@@ -91,5 +95,13 @@ public class ApplicationConfig {
 
     public void setLoadbalancer(String loadbalancer) {
         this.loadbalancer = loadbalancer;
+    }
+
+    public String getContainer() {
+        return container;
+    }
+
+    public void setContainer(String container) {
+        this.container = container;
     }
 }

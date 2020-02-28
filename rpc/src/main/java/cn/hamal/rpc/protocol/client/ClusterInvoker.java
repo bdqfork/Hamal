@@ -6,6 +6,7 @@ import cn.hamal.core.constant.ProtocolProperty;
 import cn.hamal.core.extension.ExtensionLoader;
 import cn.hamal.rpc.Invoker;
 import cn.hamal.rpc.MethodInvocation;
+import cn.hamal.rpc.RpcContext;
 import cn.hamal.rpc.protocol.loadbalance.LoadBalancer;
 import cn.hamal.rpc.registry.Notifier;
 import org.slf4j.Logger;
@@ -23,9 +24,21 @@ import java.util.stream.Collectors;
 public class ClusterInvoker<T> implements Invoker<T>, Notifier {
     private static final Logger log = LoggerFactory.getLogger(ClusterInvoker.class);
     private volatile boolean destroyed;
+    /**
+     * 消费者url
+     */
     private URL url;
+    /**
+     * 负载均衡策略
+     */
     private LoadBalancer loadBalancer;
+    /**
+     * 服务接口
+     */
     private Class<T> serviceInterface;
+    /**
+     * 端点实例
+     */
     private List<Endpoint<T>> endpoints;
 
 
@@ -72,6 +85,8 @@ public class ClusterInvoker<T> implements Invoker<T>, Notifier {
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Exception {
+        RpcContext rpcContext = RpcContext.getContext();
+        rpcContext.setConsumer(url);
         return loadBalancer.loadBalance(endpoints).invoke(methodInvocation);
     }
 

@@ -82,6 +82,11 @@ public class URL implements Serializable {
         return serviceName;
     }
 
+    /**
+     * 将URL序列化为字符串
+     *
+     * @return URL字符串
+     */
     public String toPath() {
         StringBuilder builder = new StringBuilder();
         builder.append(protocol).append("://").append(host).append(":").append(port).append("/").append(serviceName);
@@ -95,6 +100,12 @@ public class URL implements Serializable {
         return builder.toString();
     }
 
+    /**
+     * 从URL字符串反序列化为URL对象
+     *
+     * @param urlString URL字符串
+     * @return URL实例
+     */
     public static URL fromString(String urlString) {
         String[] strs = urlString.split("://");
 

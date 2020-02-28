@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * SPI扩展
+ *
  * @author bdq
  * @since 2019-08-20
  */

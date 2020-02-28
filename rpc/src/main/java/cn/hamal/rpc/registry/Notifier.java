@@ -5,6 +5,8 @@ import cn.hamal.core.URL;
 import java.util.List;
 
 /**
+ * 服务上下线通知回调
+ *
  * @author bdq
  * @since 2020/2/23
  */

@@ -6,6 +6,8 @@ import cn.hamal.core.util.StringUtils;
 import cn.hamal.rpc.annotation.Service;
 
 /**
+ * 服务提供者配置类
+ *
  * @author bdq
  * @since 2020/2/26
  */

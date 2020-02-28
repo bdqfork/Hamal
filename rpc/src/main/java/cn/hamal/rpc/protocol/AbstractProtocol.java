@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
+ * 抽象的Protocol，实现了基本的方法
+ *
  * @author bdq
  * @since 2020/2/26
  */

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * 随机负载均衡
+ *
  * @author bdq
  * @since 2020/2/26
  */

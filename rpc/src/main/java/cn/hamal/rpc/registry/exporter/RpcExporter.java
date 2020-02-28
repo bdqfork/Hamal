@@ -9,6 +9,8 @@ import cn.hamal.rpc.registry.Registry;
 import cn.hamal.rpc.registry.RegistryFactory;
 
 /**
+ * Exporter实例，可以导出服务
+ *
  * @author bdq
  * @since 2020/2/25
  */

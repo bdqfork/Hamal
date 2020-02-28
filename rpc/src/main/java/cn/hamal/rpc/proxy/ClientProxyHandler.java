@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
+ * 消费者代理处理器
+ *
  * @author bdq
  * @since 2020/2/26
  */

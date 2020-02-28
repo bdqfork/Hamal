@@ -7,6 +7,8 @@ import cn.hamal.core.extension.SPI;
 import java.util.List;
 
 /**
+ * 注册中心接口
+ *
  * @author bdq
  * @since 2020/2/23
  */

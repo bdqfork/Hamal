@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Class代码生成器
+ *
  * @author bdq
  * @since 2019/12/23
  */

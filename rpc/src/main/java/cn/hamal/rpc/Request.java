@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 请求信息
+ *
  * @author bdq
  * @since 2020/2/25
  */
@@ -11,6 +13,7 @@ public class Request implements Serializable {
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
     public static final int OK = 200;
     public static final int ERROR = 500;
+    public static final byte HEART_BEAT = 1;
     /**
      * 请求id
      */
@@ -28,9 +31,8 @@ public class Request implements Serializable {
      */
     private Object payload;
 
-    public Request(Long id, byte event) {
+    public Request(Long id) {
         this.id = id;
-        this.event = event;
     }
 
     public static Long newId() {

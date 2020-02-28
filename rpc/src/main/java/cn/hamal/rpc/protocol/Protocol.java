@@ -6,6 +6,8 @@ import cn.hamal.rpc.Invoker;
 import cn.hamal.rpc.registry.exporter.Exporter;
 
 /**
+ * 通信协议
+ *
  * @author bdq
  * @since 2020/2/26
  */
@@ -15,7 +17,7 @@ public interface Protocol {
     /**
      * 开启服务
      *
-     * @param url
+     * @param url 服务信息
      */
     void open(URL url) throws Exception;
 
@@ -29,14 +31,14 @@ public interface Protocol {
     /**
      * 获取消费者Invoker
      *
-     * @param serviceInterface
-     * @param url
-     * @return
+     * @param serviceInterface 服务接口
+     * @param url              消费者信息
+     * @return 消费者Invoker实例
      */
     <T> Invoker<T> refer(Class<T> serviceInterface, URL url);
 
     /**
-     * 关闭协议
+     * 关闭服务
      */
     void destroy();
 

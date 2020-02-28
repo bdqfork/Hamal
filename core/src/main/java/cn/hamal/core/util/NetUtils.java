@@ -37,7 +37,7 @@ public class NetUtils {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
 
         if (netip != null && !"".equals(netip)) {

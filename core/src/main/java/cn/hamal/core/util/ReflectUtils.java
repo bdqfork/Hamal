@@ -52,7 +52,7 @@ public class ReflectUtils {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
         return classes;
     }
@@ -178,6 +178,12 @@ public class ReflectUtils {
                 clazz.isPrimitive();
     }
 
+    /**
+     * 检测目标类型是否为集合类
+     *
+     * @param clazz 目标类型
+     * @return 是否为集合类
+     */
     public static boolean isCollection(Class<?> clazz) {
         return isSubType(clazz, Collection.class) || isMap(clazz);
     }

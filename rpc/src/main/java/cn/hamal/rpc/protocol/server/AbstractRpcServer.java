@@ -3,6 +3,8 @@ package cn.hamal.rpc.protocol.server;
 import cn.hamal.core.URL;
 
 /**
+ * 抽象的RpcServer，实现了基本方法
+ *
  * @author bdq
  * @since 2020/2/25
  */

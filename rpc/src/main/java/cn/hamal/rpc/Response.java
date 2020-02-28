@@ -3,6 +3,8 @@ package cn.hamal.rpc;
 import java.io.Serializable;
 
 /**
+ * 响应信息
+ *
  * @author bdq
  * @since 2020/2/25
  */
@@ -24,9 +26,8 @@ public class Response implements Serializable {
      */
     private Object payload;
 
-    public Response(Long id, byte event) {
+    public Response(Long id) {
         this.id = id;
-        this.event = event;
     }
 
     public Long getId() {

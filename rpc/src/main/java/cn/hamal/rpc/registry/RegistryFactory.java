@@ -9,5 +9,11 @@ import cn.hamal.core.extension.SPI;
  */
 @SPI("default")
 public interface RegistryFactory {
+    /**
+     * 根据注册中心的信息，生成对应的注册中心实例
+     *
+     * @param url 注册中心的信息
+     * @return 注册中心实例
+     */
     Registry getRegistry(URL url);
 }

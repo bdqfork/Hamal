@@ -11,10 +11,26 @@ import java.util.*;
 public class AnnotationUtils {
     private static final Map<CacheKey, Annotation> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
+    /**
+     * 在目标元素上获取注解实例
+     *
+     * @param element 目标元素
+     * @param target  目标注解
+     * @param <A>     类型
+     * @return 注解实例
+     */
     public static <A extends Annotation> A getAnnotation(AnnotatedElement element, Class<A> target) {
         return element.getAnnotation(target);
     }
 
+    /**
+     * 在目标元素上获取注解实例，如果目标元素上不存在，则会递归检测目标的元注解上是否存在目标注解
+     *
+     * @param element 目标元素
+     * @param target  目标注解
+     * @param <A>     类型
+     * @return 注解实例
+     */
     @SuppressWarnings("unchecked")
     public static <A extends Annotation> A getMergedAnnotation(AnnotatedElement element, Class<A> target) {
         CacheKey cacheKey = new CacheKey(element, target);
@@ -70,6 +86,12 @@ public class AnnotationUtils {
         return null;
     }
 
+    /**
+     * 检测注解是否是JVM的元注解
+     *
+     * @param metaAnnotation 待检测注解
+     * @return 是否是JVM的元注解
+     */
     public static boolean isMetaAnnotation(Class<? extends Annotation> metaAnnotation) {
         return metaAnnotation.getName().startsWith("java.lang.annotation") ||
                 metaAnnotation.getName().startsWith("kotlin.Metadata") ||

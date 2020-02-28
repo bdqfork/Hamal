@@ -6,6 +6,7 @@ import cn.hamal.core.util.NetUtils;
 import cn.hamal.core.util.StringUtils;
 
 /**
+ * 消费者配置类
  * @author bdq
  * @since 2020/2/26
  */

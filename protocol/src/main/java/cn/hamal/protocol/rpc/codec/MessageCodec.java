@@ -66,8 +66,9 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
         byte[] body = new byte[len];
         in.readBytes(body);
         if (REQUEST == type) {
-            Request request = new Request(id, event);
+            Request request = new Request(id);
             request.setStatus(status);
+            request.setEvent(event);
             MethodInvocation methodInvocation = serializer.deserialize(body, MethodInvocation.class);
             request.setPayload(methodInvocation);
             out.add(request);
@@ -75,6 +76,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
         if (RESPONSE == type) {
             Response response = new Response(id, event);
             response.setStatus(status);
+            response.setEvent(event);
             Object result = serializer.deserialize(body, Object.class);
             response.setPayload(result);
             out.add(response);
