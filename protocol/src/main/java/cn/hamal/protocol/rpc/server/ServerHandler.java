@@ -27,7 +27,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             log.debug("recieved request {}!", request.getId());
         }
 
-        Response response = new Response(request.getId(), request.getEvent());
+        Response response = new Response(request.getId());
+        response.setEvent(request.getEvent());
 
         MethodInvocation methodInvocation = (MethodInvocation) request.getPayload();
 

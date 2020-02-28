@@ -74,7 +74,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
             out.add(request);
         }
         if (RESPONSE == type) {
-            Response response = new Response(id, event);
+            Response response = new Response(id);
             response.setStatus(status);
             response.setEvent(event);
             Object result = serializer.deserialize(body, Object.class);
