@@ -14,12 +14,13 @@ ext {
     ]
 }
 allprojects {
-    group 'cn.hamal'
+    group 'com.github.bdqfork'
     version '0.1.0-SNAPSHOT'
 }
 
 subprojects {
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
     repositories {
         mavenLocal()
@@ -29,6 +30,55 @@ subprojects {
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
         }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom {
+                    name = project.name
+                    url = 'https://github.com/bdqfork/Hamal'
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            name = 'bdqfork'
+                            email = 'bdqsky@163.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git@github.com:bdqfork/Hamal.git'
+                        developerConnection = 'scm:git:git@github.com:bdqfork/Hamal.git'
+                        url = 'https://github.com/bdqfork/Hamal'
+                    }
+                }
+
+            }
+        }
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+                credentials {
+                    username ossrh_key
+                    password ossrh_pass
+                }
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
     }
 
 }

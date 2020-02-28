@@ -1,9 +1,32 @@
 apply plugin: 'java-library'
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 dependencies {
     api project(":protocol")
     api project(":registry")
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            description = project.name
+        }
+    }
+}

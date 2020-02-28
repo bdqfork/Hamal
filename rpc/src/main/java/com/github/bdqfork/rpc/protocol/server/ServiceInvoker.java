@@ -1,0 +1,52 @@
+package com.github.bdqfork.rpc.protocol.server;
+
+import com.github.bdqfork.rpc.Invoker;
+import com.github.bdqfork.rpc.MethodInvocation;
+import com.github.bdqfork.core.URL;
+
+import java.lang.reflect.Method;
+
+/**
+ * 服务执行实例
+ *
+ * @author bdq
+ * @since 2020/2/25
+ */
+public class ServiceInvoker<T> implements Invoker<T> {
+    private volatile boolean available;
+    private Object instance;
+    private Class<T> targetClass;
+    private URL url;
+
+    public ServiceInvoker(Object instance, Class<T> targetClass, URL url) {
+        this.instance = instance;
+        this.targetClass = targetClass;
+        this.url = url;
+    }
+
+    @Override
+    public Class<T> getInterface() {
+        return targetClass;
+    }
+
+    @Override
+    public Object invoke(MethodInvocation methodInvocation) throws Exception {
+        Method method = targetClass.getMethod(methodInvocation.getMethodName(), methodInvocation.getArgumentTypes());
+        return method.invoke(instance, methodInvocation.getArguments());
+    }
+
+    @Override
+    public URL getUrl() {
+        return url;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return available;
+    }
+
+    @Override
+    public void destroy() {
+        available = false;
+    }
+}

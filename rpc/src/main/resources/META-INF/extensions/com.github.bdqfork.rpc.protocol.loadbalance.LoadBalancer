@@ -1,0 +1,1 @@
+random=com.github.bdqfork.rpc.protocol.loadbalance.RandomLoadBalancer
