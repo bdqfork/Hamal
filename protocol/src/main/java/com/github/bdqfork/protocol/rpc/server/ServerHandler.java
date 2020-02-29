@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(ServerHandler.class);
-    private ServiceContainer serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class)
-            .getDefaultExtension();
+    private ServiceContainer serviceContainer;
+
+    public ServerHandler(ServiceContainer serviceContainer) {
+        this.serviceContainer = serviceContainer;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

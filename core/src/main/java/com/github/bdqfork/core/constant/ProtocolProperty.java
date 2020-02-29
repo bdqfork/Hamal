@@ -26,4 +26,6 @@ public class ProtocolProperty {
     public static final long DEFAULT_TIMEOUT = 60 * 1000;
     public static final String DEFAULT_GROUP = "rpc";
     public static final String DEFAULT_SERIALIZER = "hessian";
+    public static final String CONTATINER = "container";
+    public static final String DEFAULT_CONTAINER = "rpc";
 }

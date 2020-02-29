@@ -15,7 +15,13 @@ import com.github.bdqfork.rpc.registry.RegistryFactory;
  * @since 2020/2/25
  */
 public class RpcExporter implements Exporter {
+    /**
+     * exporter信息
+     */
     private URL url;
+    /**
+     * 注册中心
+     */
     private Registry registry;
 
     public RpcExporter(URL url) {

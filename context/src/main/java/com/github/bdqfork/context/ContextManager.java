@@ -42,10 +42,16 @@ public class ContextManager {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        if (log.isInfoEnabled()) {
+            log.info("open protocol successful!");
+        }
     }
 
     public void close() {
         serviceContainer.getAll().values().forEach(Node::destroy);
+        if (log.isInfoEnabled()) {
+            log.info("destroyed all service!");
+        }
         protocol.destroy();
         if (log.isInfoEnabled()) {
             log.info("closed context!");
@@ -92,14 +98,7 @@ public class ContextManager {
     public static ContextManager build(Class<?> clazz) {
         Application application = AnnotationUtils.getMergedAnnotation(clazz, Application.class);
         assert application != null;
-
         ApplicationConfig applicationConfig = new ApplicationConfig(application);
-        ContextManager contextManager = new ContextManager(applicationConfig);
-
-        if (application.startUp()) {
-            contextManager.open();
-        }
-
-        return contextManager;
+        return new ContextManager(applicationConfig);
     }
 }

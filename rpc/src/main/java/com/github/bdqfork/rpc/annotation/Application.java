@@ -50,11 +50,6 @@ public @interface Application {
     boolean direct() default false;
 
     /**
-     * 是否开启服务
-     */
-    boolean startUp() default false;
-
-    /**
      * 指定服务容器
      */
     String container() default "rpc";

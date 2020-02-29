@@ -1,6 +1,9 @@
 package com.github.bdqfork.rpc.protocol.server;
 
 import com.github.bdqfork.core.URL;
+import com.github.bdqfork.core.constant.ProtocolProperty;
+import com.github.bdqfork.core.extension.ExtensionLoader;
+import com.github.bdqfork.rpc.container.ServiceContainer;
 
 /**
  * 抽象的RpcServer，实现了基本方法
@@ -10,6 +13,7 @@ import com.github.bdqfork.core.URL;
  */
 public abstract class AbstractRpcServer implements RpcServer {
     protected volatile boolean available;
+    protected ServiceContainer serviceContainer;
     protected String host;
     protected Integer port;
     private URL url;
@@ -18,6 +22,12 @@ public abstract class AbstractRpcServer implements RpcServer {
         this.url = url;
         this.host = url.getHost();
         this.port = url.getPort();
+        initServiceContainer(url);
+    }
+
+    private void initServiceContainer(URL url) {
+        String containerType = url.getParam(ProtocolProperty.CONTATINER, ProtocolProperty.DEFAULT_CONTAINER);
+        this.serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class).getExtension(containerType);
     }
 
     @Override

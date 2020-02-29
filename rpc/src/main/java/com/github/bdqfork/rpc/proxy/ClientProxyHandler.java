@@ -13,6 +13,9 @@ import java.lang.reflect.Method;
  * @since 2020/2/26
  */
 public class ClientProxyHandler implements InvocationHandler {
+    /**
+     * 消费者invoker
+     */
     private Invoker<?> invoker;
 
     public ClientProxyHandler(Invoker<?> invoker) {

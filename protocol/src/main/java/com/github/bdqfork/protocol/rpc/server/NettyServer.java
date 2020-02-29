@@ -50,7 +50,7 @@ public class NettyServer extends AbstractRpcServer {
                             ch.pipeline()
                                     .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4, 14, 0))
                                     .addLast(new MessageCodec(serializer))
-                                    .addLast(new ServerHandler());
+                                    .addLast(new ServerHandler(serviceContainer));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

@@ -13,25 +13,37 @@ import java.lang.reflect.Method;
  * @since 2020/2/25
  */
 public class ServiceInvoker<T> implements Invoker<T> {
+    /**
+     * 服务状态
+     */
     private volatile boolean available;
+    /**
+     * 服务实例
+     */
     private Object instance;
-    private Class<T> targetClass;
+    /**
+     * 服务类型
+     */
+    private Class<T> serviceInterface;
+    /**
+     * 服务信息
+     */
     private URL url;
 
-    public ServiceInvoker(Object instance, Class<T> targetClass, URL url) {
+    public ServiceInvoker(Object instance, Class<T> serviceInterface, URL url) {
         this.instance = instance;
-        this.targetClass = targetClass;
+        this.serviceInterface = serviceInterface;
         this.url = url;
     }
 
     @Override
     public Class<T> getInterface() {
-        return targetClass;
+        return serviceInterface;
     }
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Exception {
-        Method method = targetClass.getMethod(methodInvocation.getMethodName(), methodInvocation.getArgumentTypes());
+        Method method = serviceInterface.getMethod(methodInvocation.getMethodName(), methodInvocation.getArgumentTypes());
         return method.invoke(instance, methodInvocation.getArguments());
     }
 

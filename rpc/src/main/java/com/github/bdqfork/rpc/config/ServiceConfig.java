@@ -12,11 +12,29 @@ import com.github.bdqfork.rpc.annotation.Service;
  * @since 2020/2/26
  */
 public class ServiceConfig<T> {
+    /**
+     * 服务分组
+     */
     private String group = ProtocolProperty.DEFAULT_GROUP;
+    /**
+     * 超时时间
+     */
     private long timeout = ProtocolProperty.DEFAULT_TIMEOUT;
+    /**
+     * 服务类型
+     */
     private Class<T> serviceInterface;
+    /**
+     * 版本
+     */
     private String version;
+    /**
+     * 地址
+     */
     private String host;
+    /**
+     * 端口
+     */
     private Integer port;
 
     @SuppressWarnings("unchecked")

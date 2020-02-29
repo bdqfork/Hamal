@@ -16,6 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020/2/26
  */
 public class DefaultServiceContainer implements ServiceContainer {
+    /**
+     * service容器
+     */
     private final Map<String, Invoker<?>> serviceInvokerMap = new ConcurrentHashMap<>(256);
 
     @Override

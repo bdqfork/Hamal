@@ -7,14 +7,30 @@ import com.github.bdqfork.core.util.StringUtils;
 
 /**
  * 消费者配置类
+ *
  * @author bdq
  * @since 2020/2/26
  */
 public class ReferenceConfig<T> {
+    /**
+     * 服务的分组
+     */
     private String group = ProtocolProperty.DEFAULT_GROUP;
+    /**
+     * 超时时间
+     */
     private long timeout = ProtocolProperty.DEFAULT_TIMEOUT;
+    /**
+     * 连接数
+     */
     private int connections = 1;
+    /**
+     * 服务类型
+     */
     private Class<T> serviceInterface;
+    /**
+     * 服务版本
+     */
     private String version;
 
     public ReferenceConfig(Class<T> serviceInterface) {

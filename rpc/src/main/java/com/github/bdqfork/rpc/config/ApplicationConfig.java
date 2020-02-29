@@ -1,6 +1,7 @@
 package com.github.bdqfork.rpc.config;
 
 import com.github.bdqfork.core.URL;
+import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.rpc.annotation.Application;
 
 /**
@@ -10,13 +11,37 @@ import com.github.bdqfork.rpc.annotation.Application;
  * @since 2020/2/26
  */
 public class ApplicationConfig {
+    /**
+     * 地址
+     */
     private String host;
+    /**
+     * 端口
+     */
     private Integer port;
+    /**
+     * 协议名称
+     */
     private String protocol;
+    /**
+     * 服务器类型
+     */
     private String server;
+    /**
+     * 序列化方式
+     */
     private String serilizer;
+    /**
+     * 是否开启端到端直连
+     */
     private boolean direct;
+    /**
+     * 负载均衡策略
+     */
     private String loadbalancer;
+    /**
+     * service容器类型
+     */
     private String container;
 
     public ApplicationConfig(Application application) {
@@ -38,7 +63,12 @@ public class ApplicationConfig {
     }
 
     public URL toURL() {
-        return new URL(protocol, host, port, server);
+        URL url = new URL(protocol, host, port, server);
+        url.addParam(ProtocolProperty.SERIALIZER, serilizer);
+        url.addParam(ProtocolProperty.DIRECT, direct);
+        url.addParam(ProtocolProperty.LOAD_BALANCER, loadbalancer);
+        url.addParam(ProtocolProperty.CONTATINER, container);
+        return url;
     }
 
     public String getHost() {

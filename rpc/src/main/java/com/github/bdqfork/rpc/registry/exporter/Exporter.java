@@ -10,5 +10,10 @@ import com.github.bdqfork.rpc.Invoker;
  * @since 2020/2/25
  */
 public interface Exporter extends Node {
+    /**
+     * 导出服务
+     *
+     * @param invoker 消费者或者服务提供者
+     */
     void export(Invoker<?> invoker);
 }
