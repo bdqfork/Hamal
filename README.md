@@ -8,7 +8,7 @@
 ## GetStart
 引入依赖
 ```groovy
-implementation "com.github.bdqfork:context:0.1.0"
+implementation "com.github.bdqfork:hamal-context:0.1.0"
 ```
 定义接口，例如UserService
 ```java
