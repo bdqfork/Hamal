@@ -12,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +50,12 @@ public class NettyServer extends AbstractRpcServer {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
                                     .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4, 14, 0))
+                                    .addLast(new IdleStateHandler(120, 60, 0))
                                     .addLast(new MessageCodec(serializer))
                                     .addLast(new ServerHandler(serviceContainer));
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    .option(ChannelOption.SO_BACKLOG, 128);
 
             ChannelFuture future = bootstrap.bind(host, port).sync();
             channel = future.channel();

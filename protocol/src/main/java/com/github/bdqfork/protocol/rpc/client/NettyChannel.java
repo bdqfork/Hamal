@@ -38,7 +38,6 @@ public class NettyChannel extends AbstractChannel {
         bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)
                 .remoteAddress(host, port)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -70,6 +69,9 @@ public class NettyChannel extends AbstractChannel {
                 }
             } else {
                 throw new RemoteException(channelFuture.cause());
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("connect to {}:{} successful!", host, port);
             }
         }
     }
