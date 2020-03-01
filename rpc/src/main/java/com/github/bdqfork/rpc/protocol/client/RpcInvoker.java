@@ -4,7 +4,7 @@ import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.core.extension.ExtensionLoader;
 import com.github.bdqfork.rpc.MethodInvocation;
-import com.github.bdqfork.rpc.Request;
+import com.github.bdqfork.rpc.protocol.Request;
 import com.github.bdqfork.rpc.RpcContext;
 
 import java.net.InetSocketAddress;

@@ -1,6 +1,9 @@
 package com.github.bdqfork.rpc;
 
 import com.github.bdqfork.core.exception.TimeoutException;
+import com.github.bdqfork.rpc.protocol.Request;
+import com.github.bdqfork.rpc.protocol.Response;
+import com.github.bdqfork.rpc.protocol.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +66,11 @@ public class DefaultFuture extends CompletableFuture<Object> {
             return;
         }
         future.timerTask.cancel();
+        Result result = (Result) response.getPayload();
         if (response.getStatus() == Request.ERROR) {
-            future.completeExceptionally((Throwable) response.getPayload());
+            future.completeExceptionally(result.getThrowable());
         } else {
-            future.complete(response.getPayload());
+            future.complete(result.getData());
         }
     }
 }

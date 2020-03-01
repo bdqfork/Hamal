@@ -1,11 +1,67 @@
 一个基于netty的轻量级rpc框架，使用方式可参考example。
 
-Features:
+## Features:
 - 基于netty实现rpc协议
 - 支持端到端的rpc调用
 - 支持使用SPI进行功能扩展
 
-#### todolist:
+## GetStart
+首先定义接口，例如UserService
+```java
+public interface UserService {
+    User getUser(Long id);
+}
+```
+在服务端实现接口
+```java
+@Service(serviceInterface = UserService.class)
+public class UserServiceImpl implements UserService {
+    @Override
+    public User getUser(Long id) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername("testRpc");
+        user.setPassword("testpass");
+        return user;
+    }
+}
+```
+初始化上下文，启动服务端，默认监听8080端口
+```java
+@Application(direct = true)
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ContextManager contextManager = ContextManager.build(Main.class);
+        contextManager.registerService(new UserServiceImpl());
+        contextManager.open();
+        CountDownLatch latch = new CountDownLatch(1);
+        latch.await();
+    }
+}
+```
+客户端同样初始化上下文，但不需要open服务器
+```java
+@Application(direct = true)
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ContextManager contextManager = ContextManager.build(Main.class);
+        //客户端配置
+        ReferenceConfig<?> referenceConfig = new ReferenceConfig<>(UserService.class);
+        referenceConfig.setConnections(2);
+        //获取代理实例
+        UserService userService = (UserService) contextManager.getProxy(referenceConfig);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(40, 50, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(512),
+                new ThreadPoolExecutor.DiscardPolicy());
+        while (true) {
+            executor.execute(() -> {
+                User user = userService.getUser(1L);
+                System.out.println(user);
+            });
+        }
+    }
+}
+```
+## todolist:
 - 心跳机制
 - 实现zookeeper注册中心
 - 实现服务分组功能

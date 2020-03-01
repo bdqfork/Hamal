@@ -34,7 +34,7 @@ public class ClientProxyHandler implements InvocationHandler {
             return invoker.equals(args[0]);
         }
         MethodInvocation methodInvocation = new MethodInvocation(invoker.getInterface().getCanonicalName(), method.getName(),
-                method.getParameterTypes(), args);
+                method.getParameterTypes(), args, method.getReturnType());
         return invoker.invoke(methodInvocation);
     }
 }

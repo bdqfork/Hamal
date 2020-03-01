@@ -6,7 +6,7 @@ import com.github.bdqfork.core.exception.RemoteException;
 import com.github.bdqfork.core.exception.RpcException;
 import com.github.bdqfork.protocol.rpc.codec.MessageCodec;
 import com.github.bdqfork.rpc.DefaultFuture;
-import com.github.bdqfork.rpc.Request;
+import com.github.bdqfork.rpc.protocol.Request;
 import com.github.bdqfork.rpc.RpcContext;
 import com.github.bdqfork.rpc.protocol.client.AbstractChannel;
 import io.netty.bootstrap.Bootstrap;

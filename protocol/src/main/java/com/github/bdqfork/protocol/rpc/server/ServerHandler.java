@@ -1,11 +1,10 @@
 package com.github.bdqfork.protocol.rpc.server;
 
-import com.github.bdqfork.core.extension.ExtensionLoader;
-import com.github.bdqfork.rpc.Invoker;
-import com.github.bdqfork.rpc.MethodInvocation;
-import com.github.bdqfork.rpc.Request;
-import com.github.bdqfork.rpc.Response;
+import com.github.bdqfork.rpc.*;
 import com.github.bdqfork.rpc.container.ServiceContainer;
+import com.github.bdqfork.rpc.protocol.Request;
+import com.github.bdqfork.rpc.protocol.Response;
+import com.github.bdqfork.rpc.protocol.Result;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -38,10 +37,10 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         Invoker<?> invoker = serviceContainer.get(methodInvocation.getInterfaceName());
         try {
             Object result = invoker.invoke(methodInvocation);
-            response.setPayload(result);
+            response.setPayload(new Result(methodInvocation.getReturnType(), result));
         } catch (Exception e) {
             response.setStatus(Request.ERROR);
-            response.setPayload(e);
+            response.setPayload(new Result(e));
             if (log.isErrorEnabled()) {
                 log.error(e.getMessage(), e);
             }
@@ -50,4 +49,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         ctx.writeAndFlush(response);
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        if (log.isErrorEnabled()) {
+            log.error(cause.getMessage(), cause);
+        }
+    }
 }

@@ -4,8 +4,9 @@ import com.github.bdqfork.core.exception.SerializerException;
 import com.github.bdqfork.core.exception.UnknownPacketException;
 import com.github.bdqfork.core.serializer.Serializer;
 import com.github.bdqfork.rpc.MethodInvocation;
-import com.github.bdqfork.rpc.Request;
-import com.github.bdqfork.rpc.Response;
+import com.github.bdqfork.rpc.protocol.Request;
+import com.github.bdqfork.rpc.protocol.Response;
+import com.github.bdqfork.rpc.protocol.Result;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
@@ -77,7 +78,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
             Response response = new Response(id);
             response.setStatus(status);
             response.setEvent(event);
-            Object result = serializer.deserialize(body, Object.class);
+            Object result = serializer.deserialize(body, Result.class);
             response.setPayload(result);
             out.add(response);
         }

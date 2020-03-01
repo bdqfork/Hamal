@@ -29,6 +29,11 @@ public class Main {
                 User user = userService.getUser(1L);
                 System.out.println(user);
             });
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

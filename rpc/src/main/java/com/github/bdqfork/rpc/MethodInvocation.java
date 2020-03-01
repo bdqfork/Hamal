@@ -25,27 +25,59 @@ public class MethodInvocation implements Serializable {
      * 参数
      */
     private Object[] arguments;
+    /**
+     * 返回值类型
+     */
+    private Class<?> returnType;
 
-    public MethodInvocation(String interfaceName, String methodName, Class<?>[] argumentTypes, Object[] arguments) {
+    public MethodInvocation() {
+    }
+
+    public MethodInvocation(String interfaceName, String methodName, Class<?>[] argumentTypes, Object[] arguments, Class<?> returnType) {
         this.interfaceName = interfaceName;
         this.methodName = methodName;
         this.argumentTypes = argumentTypes;
         this.arguments = arguments;
+        this.returnType = returnType;
     }
 
     public String getInterfaceName() {
         return interfaceName;
     }
 
+    public void setInterfaceName(String interfaceName) {
+        this.interfaceName = interfaceName;
+    }
+
     public String getMethodName() {
         return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 
     public Class<?>[] getArgumentTypes() {
         return argumentTypes;
     }
 
+    public void setArgumentTypes(Class<?>[] argumentTypes) {
+        this.argumentTypes = argumentTypes;
+    }
+
     public Object[] getArguments() {
         return arguments;
+    }
+
+    public void setArguments(Object[] arguments) {
+        this.arguments = arguments;
+    }
+
+    public Class<?> getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(Class<?> returnType) {
+        this.returnType = returnType;
     }
 }

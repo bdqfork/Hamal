@@ -1,4 +1,4 @@
-package com.github.bdqfork.rpc;
+package com.github.bdqfork.rpc.protocol;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
