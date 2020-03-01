@@ -62,7 +62,6 @@ public class Main {
 }
 ```
 ## todolist:
-- 心跳机制
 - 实现zookeeper注册中心
 - 实现服务分组功能
 - 实现超时重试策略
