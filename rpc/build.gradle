@@ -22,6 +22,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
+            artifactId = 'hamal-rpc'
+
             artifact sourcesJar
             artifact javadocJar
 

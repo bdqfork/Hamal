@@ -33,6 +33,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
+            artifactId = 'hamal-registry'
+
             artifact sourcesJar
             artifact javadocJar
 

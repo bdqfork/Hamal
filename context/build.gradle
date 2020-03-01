@@ -23,6 +23,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
+            artifactId = 'hamal-context'
+
             artifact sourcesJar
             artifact javadocJar
 
