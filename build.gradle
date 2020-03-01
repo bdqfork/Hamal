@@ -14,8 +14,8 @@ ext {
     ]
 }
 allprojects {
-    group 'com.github.bdqfork'
-    version '0.1.0-SNAPSHOT'
+    group = 'com.github.bdqfork'
+    version = '0.1.0'
 }
 
 subprojects {
@@ -64,12 +64,9 @@ subprojects {
                 def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                 def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-                if (hasProperty("ossrh_key") && hasProperty("ossrh_pass")) {
-                    credentials {
-                        username ossrh_key
-                        password ossrh_pass
-                    }
+                credentials {
+                    username ossrh_key
+                    password ossrh_pass
                 }
             }
         }

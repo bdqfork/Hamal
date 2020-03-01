@@ -6,7 +6,11 @@
 - 支持使用SPI进行功能扩展
 
 ## GetStart
-首先定义接口，例如UserService
+引入依赖
+```groovy
+implementation "com.github.bdqfork:context:0.1.0"
+```
+定义接口，例如UserService
 ```java
 public interface UserService {
     User getUser(Long id);

@@ -17,6 +17,17 @@ task javadocJar(type: Jar) {
     from javadoc.destinationDir
 }
 
+tasks.withType(PublishToMavenRepository) {
+    onlyIf {
+        false
+    }
+}
+tasks.withType(PublishToMavenLocal) {
+    onlyIf {
+        false
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -25,7 +36,9 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
 
-            description = project.name
+            pom {
+                description = project.name
+            }
         }
     }
 }

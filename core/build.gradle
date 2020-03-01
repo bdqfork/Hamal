@@ -36,7 +36,9 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
 
-            description = project.name
+            pom {
+                description = project.name
+            }
         }
     }
 }
