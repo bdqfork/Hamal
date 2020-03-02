@@ -3,6 +3,7 @@ package com.github.bdqfork.core.extension;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -141,35 +142,52 @@ public class ExtensionLoader<T> {
         }
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            Enumeration<java.net.URL> urlEnumeration = classLoader.getResources(PREFIX + type.getName());
+
+            // 加载扩展文件
+            Enumeration<URL> urlEnumeration = classLoader.getResources(PREFIX + type.getName());
+
             while (urlEnumeration.hasMoreElements()) {
-                java.net.URL url = urlEnumeration.nextElement();
+
+                URL url = urlEnumeration.nextElement();
+
                 if (url.getPath().isEmpty()) {
                     throw new IllegalArgumentException("Extension path " + PREFIX + type.getName() + " don't exsist !");
                 }
+
+                // 读取文件内容
                 if (url.getProtocol().equals("file") || url.getProtocol().equals("jar")) {
+
                     URLConnection urlConnection = url.openConnection();
                     Reader reader = new InputStreamReader(urlConnection.getInputStream());
                     BufferedReader bufferedReader = new BufferedReader(reader);
+
+                    // 逐行读取
                     String line;
                     while ((line = bufferedReader.readLine()) != null) {
+
                         if (line.equals("")) {
                             continue;
                         }
-                        //过滤注释
+
+                        // 过滤注释
                         if (line.contains("#")) {
                             line = line.substring(0, line.indexOf("#"));
                         }
+
+                        // 解析key=value
                         String[] values = line.split("=");
                         String name = values[0].trim();
                         String impl = values[1].trim();
+
                         if (extensionClasses.containsKey(name)) {
                             throw new IllegalStateException("Duplicate extension named " + name);
                         }
 
+                        // 加载Class
                         @SuppressWarnings("unchecked")
                         Class<T> clazz = (Class<T>) classLoader.loadClass(impl);
 
+                        // 缓存Class
                         classNames.putIfAbsent(clazz, name);
                         extensionClasses.putIfAbsent(name, clazz);
                     }
