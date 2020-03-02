@@ -16,13 +16,33 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2019-08-20
  */
 public class ExtensionLoader<T> {
+    /**
+     * 扫描路径
+     */
     private static final String PREFIX = "META-INF/extensions/";
+    /**
+     * 缓存
+     */
     private static final Map<String, ExtensionLoader<?>> CACHES = new ConcurrentHashMap<>();
+    /**
+     * 扩展Class名称缓存
+     */
     private final Map<Class<T>, String> classNames = new ConcurrentHashMap<>();
+    /**
+     * 扩展Class缓存
+     */
     private final Map<String, Class<T>> extensionClasses = new ConcurrentHashMap<>();
-
+    /**
+     * 扩展实例缓存
+     */
     private volatile Map<String, T> cacheExtensions;
+    /**
+     * 默认扩展名
+     */
     private String defaultName;
+    /**
+     * 扩展服务类型
+     */
     private Class<T> type;
 
     private ExtensionLoader(Class<T> type) {
