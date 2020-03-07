@@ -43,8 +43,8 @@ public abstract class AbstractChannel implements Channel {
 
     @Override
     public void destroy() {
-        available = false;
         doDestroy();
+        available = false;
     }
 
     protected abstract void doDestroy();
