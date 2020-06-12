@@ -74,3 +74,4 @@ public class Main {
 - 实现Filter
 - 支持异步调用
 - 添加log信息
+- 支持JSON-RPC
