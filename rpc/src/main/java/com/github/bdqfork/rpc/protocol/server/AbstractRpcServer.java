@@ -42,9 +42,9 @@ public abstract class AbstractRpcServer implements RpcServer {
 
     @Override
     public void destroy() {
-        available = false;
         try {
             doDestroy();
+            available = false;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
