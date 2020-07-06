@@ -43,6 +43,31 @@ public class Main {
     }
 }
 ```
+也可以不依赖注解启动
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ApplicationConfig applicationConfig = new ApplicationConfig("127.0.0.1", 8080, "rpc", "netty");
+        applicationConfig.setContainer("rpc");
+        applicationConfig.setDirect(true);
+        applicationConfig.setLoadbalancer("random");
+        applicationConfig.setSerilizer("hessian");
+        ContextManager contextManager = new ContextManager(applicationConfig);
+        contextManager.registerService(new UserServiceImpl());
+        contextManager.open();
+        CountDownLatch latch = new CountDownLatch(1);
+        latch.await();
+    }
+}
+```
+如果实现的接口上未标注`@Service`
+则需要在注册服务时如下提供其他信息
+```java
+ServiceConfig<UserService> serviceConfig = new ServiceConfig<>(UserService.class);
+contextManager.registerService(new UserServiceImpl(), serviceConfig);
+
+```
+
 客户端同样初始化上下文，但不需要open服务器
 ```java
 @Application(direct = true)
@@ -61,6 +86,38 @@ public class Main {
                 User user = userService.getUser(1L);
                 System.out.println(user);
             });
+        }
+    }
+}
+```
+同样也可以不依赖注解启动
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        ApplicationConfig applicationConfig = new ApplicationConfig("127.0.0.1", 8080, "rpc", "netty");
+        applicationConfig.setContainer("rpc");
+        applicationConfig.setDirect(true);
+        applicationConfig.setLoadbalancer("random");
+        applicationConfig.setSerilizer("hessian");
+        ContextManager contextManager = new ContextManager(applicationConfig);
+        ReferenceConfig<?> referenceConfig = new ReferenceConfig<>(UserService.class);
+        referenceConfig.setConnections(2);
+
+        UserService userService = (UserService) contextManager.getProxy(referenceConfig);
+
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(40, 50, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(512),
+                new ThreadPoolExecutor.DiscardPolicy());
+        while (true) {
+            executor.execute(() -> {
+                User user = userService.getUser(1L);
+                System.out.println(user);
+            });
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
