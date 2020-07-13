@@ -10,6 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 2020/2/25
  */
 public class Request implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6866116312970066166L;
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
     public static final int OK = 200;
     public static final int ERROR = 500;
