@@ -10,6 +10,10 @@ import java.io.Serializable;
  */
 public class MethodInvocation implements Serializable {
     /**
+     *
+     */
+    private static final long serialVersionUID = -9169729641171647869L;
+    /**
      * 接口名称
      */
     private String interfaceName;
@@ -33,7 +37,8 @@ public class MethodInvocation implements Serializable {
     public MethodInvocation() {
     }
 
-    public MethodInvocation(String interfaceName, String methodName, Class<?>[] argumentTypes, Object[] arguments, Class<?> returnType) {
+    public MethodInvocation(String interfaceName, String methodName, Class<?>[] argumentTypes, Object[] arguments,
+            Class<?> returnType) {
         this.interfaceName = interfaceName;
         this.methodName = methodName;
         this.argumentTypes = argumentTypes;
