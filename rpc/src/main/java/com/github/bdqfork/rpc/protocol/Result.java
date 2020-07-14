@@ -8,6 +8,10 @@ import java.io.Serializable;
  */
 public class Result implements Serializable {
     /**
+     *
+     */
+    private static final long serialVersionUID = 2931385307864821352L;
+    /**
      * 返回值类型
      */
     private Class<?> dateType;

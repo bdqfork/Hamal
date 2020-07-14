@@ -29,3 +29,4 @@ file-uploads/
 build/
 out/
 gradle.properties
+bin/
