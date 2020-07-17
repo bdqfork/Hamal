@@ -87,17 +87,17 @@ public class ZookeeperRegistry extends AbstractRegistry {
     public List<URL> lookup(URL url) {
         Set<URL> providers = new HashSet<>();
         String providerPath = toServicePath(url) + PATH_SEPARATOR + ProtocolProperty.PROVIDER;
-        List<String> childrens = null;
+        List<String> children = null;
         try {
-            childrens = client.getChildren().forPath(providerPath);
+            children = client.getChildren().forPath(providerPath);
         } catch (KeeperException.NoNodeException ignored) {
         }catch (Exception e) {
             e.printStackTrace();
         }
-        if (childrens == null) {
+        if (children == null) {
             return null;
         }
-        for (String s : childrens) {
+        for (String s : children) {
             providers.add(URL.fromString(Objects.requireNonNull(doGetContent(providerPath + PATH_SEPARATOR + s))));
         }
         return new ArrayList<>(providers);

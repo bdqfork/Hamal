@@ -9,6 +9,8 @@ dependencies {
     implementation "org.apache.curator:curator-recipes:${libs.curator}"
     implementation "org.apache.curator:curator-x-discovery-server:${libs.curator}"
     implementation project(":rpc")
+
+    testImplementation "org.junit.jupiter:junit-jupiter:${libs.junit}"
 }
 
 task sourcesJar(type: Jar) {
