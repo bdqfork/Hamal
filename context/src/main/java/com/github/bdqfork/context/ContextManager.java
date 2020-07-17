@@ -15,6 +15,7 @@ import com.github.bdqfork.rpc.config.ReferenceConfig;
 import com.github.bdqfork.rpc.config.ServiceConfig;
 import com.github.bdqfork.rpc.container.ServiceContainer;
 import com.github.bdqfork.rpc.protocol.Protocol;
+import com.github.bdqfork.rpc.registry.exporter.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ public class ContextManager {
     private Protocol protocol;
     private ApplicationConfig applicationConfig;
     private ServiceContainer serviceContainer;
+    private Exporter exporter;
 
     public ContextManager(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
@@ -34,6 +36,9 @@ public class ContextManager {
                 .getExtension(applicationConfig.getProtocol());
         this.serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class)
                 .getExtension(applicationConfig.getContainer());
+        if (!applicationConfig.isDirect()) {
+            this.exporter = protocol.export(applicationConfig.toURL());
+        }
     }
 
     public void open() {
@@ -70,6 +75,9 @@ public class ContextManager {
             url.addParam(ProtocolProperty.PROTOCOL, applicationConfig.getProtocol());
         }
         Invoker<T> invoker = protocol.refer(referenceConfig.getServiceInterface(), url);
+        if (!applicationConfig.isDirect()) {
+            exporter.export(invoker);
+        }
         return InvokerFactory.getProxy(invoker);
     }
 
@@ -84,7 +92,13 @@ public class ContextManager {
         serviceConfig.setHost(applicationConfig.getHost());
         serviceConfig.setPort(applicationConfig.getPort());
         Class<T> serviceInterface = serviceConfig.getServiceInterface();
-        Invoker<T> invoker = InvokerFactory.getServiceInvoker(instance, serviceInterface, serviceConfig.toURL());
+        URL serviceUrl = serviceConfig.toURL();
+        serviceUrl.addParam(ProtocolProperty.PROTOCOL, applicationConfig.getProtocol());
+        serviceUrl.addParam(ProtocolProperty.SERIALIZER, applicationConfig.getSerilizer());
+        Invoker<T> invoker = InvokerFactory.getServiceInvoker(instance, serviceInterface, serviceUrl);
+        if (!applicationConfig.isDirect()) {
+            exporter.export(invoker);
+        }
         try {
             serviceContainer.regsiter(serviceInterface.getCanonicalName(), invoker);
         } catch (ConfilictServiceException e) {

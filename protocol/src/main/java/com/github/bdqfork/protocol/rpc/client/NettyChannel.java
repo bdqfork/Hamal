@@ -33,7 +33,7 @@ public class NettyChannel extends AbstractChannel {
 
     public NettyChannel(URL url) {
         super(url);
-        timeout = url.getParam(ProtocolProperty.TIMEOUT);
+        timeout = Long.parseLong(url.getParam(ProtocolProperty.TIMEOUT));
         workerGroup = new NioEventLoopGroup(1);
         bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)

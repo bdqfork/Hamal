@@ -3,7 +3,11 @@ apply plugin: 'java-library'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+def libs = rootProject.ext.libraries
+
 dependencies {
+    implementation "org.apache.curator:curator-recipes:${libs.curator}"
+    implementation "org.apache.curator:curator-x-discovery-server:${libs.curator}"
     implementation project(":rpc")
 }
 

@@ -43,6 +43,18 @@ public class ApplicationConfig {
      * service容器类型
      */
     private String container;
+    /**
+     * 注册中心
+     */
+    private String registry;
+
+    public String getRegistry() {
+        return registry;
+    }
+
+    public void setRegistry(String registry) {
+        this.registry = registry;
+    }
 
     public ApplicationConfig(Application application) {
         this.host = application.host();
@@ -53,6 +65,7 @@ public class ApplicationConfig {
         this.direct = application.direct();
         this.loadbalancer = application.loadbalancer();
         this.container = application.container();
+        this.registry = application.registry();
     }
 
     public ApplicationConfig(String host, Integer port, String protocol, String server) {
@@ -68,6 +81,7 @@ public class ApplicationConfig {
         url.addParam(ProtocolProperty.DIRECT, direct);
         url.addParam(ProtocolProperty.LOAD_BALANCER, loadbalancer);
         url.addParam(ProtocolProperty.CONTATINER, container);
+        url.addParam(ProtocolProperty.REGISTRY, registry);
         return url;
     }
 
