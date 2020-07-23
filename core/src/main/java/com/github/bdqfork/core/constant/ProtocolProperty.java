@@ -24,6 +24,7 @@ public class ProtocolProperty {
     public static final String RETRIES = "reties";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String ADDRESS = "address";
 
     public static final long DEFAULT_TIMEOUT = 60 * 1000;
     public static final String DEFAULT_GROUP = "rpc";

@@ -12,6 +12,7 @@ import com.github.bdqfork.rpc.annotation.Application;
 import com.github.bdqfork.rpc.annotation.Service;
 import com.github.bdqfork.rpc.config.ApplicationConfig;
 import com.github.bdqfork.rpc.config.ReferenceConfig;
+import com.github.bdqfork.rpc.config.RegistryConfig;
 import com.github.bdqfork.rpc.config.ServiceConfig;
 import com.github.bdqfork.rpc.container.ServiceContainer;
 import com.github.bdqfork.rpc.protocol.Protocol;
@@ -31,14 +32,22 @@ public class ContextManager {
     private Exporter exporter;
 
     public ContextManager(ApplicationConfig applicationConfig) {
+        init(applicationConfig);
+    }
+
+    public ContextManager(ApplicationConfig applicationConfig ,RegistryConfig registryConfig) {
+        init(applicationConfig);
+        URL exportUrl = new URL(ProtocolProperty.EXPORTER, "127.0.0.1", 0, "rpc");
+        exportUrl.addParam(ProtocolProperty.REGISTRY, registryConfig.toURL());
+        this.exporter = protocol.export(exportUrl);
+    }
+
+    public void init(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
         this.protocol = ExtensionLoader.getExtensionLoader(Protocol.class)
                 .getExtension(applicationConfig.getProtocol());
         this.serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class)
                 .getExtension(applicationConfig.getContainer());
-        if (!applicationConfig.isDirect()) {
-            this.exporter = protocol.export(applicationConfig.toURL());
-        }
     }
 
     public void open() {

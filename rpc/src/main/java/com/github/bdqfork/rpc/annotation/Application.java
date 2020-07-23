@@ -53,6 +53,4 @@ public @interface Application {
      * 指定服务容器
      */
     String container() default "rpc";
-
-    String registry() default "";
 }

@@ -157,12 +157,8 @@ public class URL implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        URL url = (URL) o;
-        return Objects.equals(protocol, url.protocol) &&
-                Objects.equals(host, url.host) &&
-                Objects.equals(port, url.port) &&
-                Objects.equals(serviceName, url.serviceName) &&
-                Objects.equals(params, url.params);
+        String url = ((URL)o).toPath();
+        return url.equals(toPath());
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,12 +31,15 @@ import java.util.concurrent.TimeUnit;
 public class ZookeeperRegistry extends AbstractRegistry {
 
     protected static final Logger logger = LoggerFactory.getLogger(ZookeeperRegistry.class);
-    private final static String DEFAULT_ROOT = "hamal";
+    private final static String DEFAULT_ROOT = "rpc";
     private final static String PATH_SEPARATOR = "/";
     private final String root;
     private static final String ZK_SESSION_EXPIRE_KEY = "zk.session.expire";
     private static int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     private static int DEFAULT_SESSION_TIMEOUT_MS = 60 * 1000;
+    private static final String DEFAULT_ADDRESS = "127.0.0.1:2181";
+    private Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
+    private Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
     private CuratorFramework client;
     static final Charset CHARSET = StandardCharsets.UTF_8;
 
@@ -47,8 +51,9 @@ public class ZookeeperRegistry extends AbstractRegistry {
     @Override
     public void register(URL url) {
         try {
-            createParentPath(toParentPath(url));
+            createPersistent(toParentPath(url));
             createEphemeral(toPath(url), url.toPath());
+            cacheNodes.putIfAbsent(toPath(url), url);
         } catch (Throwable e) {
             new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e).printStackTrace();
         }
@@ -58,6 +63,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     public void undoRegister(URL url) {
         try {
             deletePath(toPath(url));
+            cacheNodes.remove(toPath(url));
         } catch (Throwable e) {
             new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e).printStackTrace();
         }
@@ -67,11 +73,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
     public void subscribe(URL url, Notifier notifier) {
         String providerPath = toServicePath(url) + PATH_SEPARATOR + ProtocolProperty.PROVIDER;
         notifier.notify(lookup(url));
-        PathChildrenCache cache = new PathChildrenCache(client, providerPath, true);
+        PathChildrenCache cache = new PathChildrenCache(client, providerPath, false);
         try {
             cache.start();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("PathChildrenCache start failed! cause %s", e.getMessage());
         }
         PathChildrenCacheListener cacheListener = (c, event) -> {
             PathChildrenCacheEvent.Type type = event.getType();
@@ -79,57 +85,68 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 notifier.notify(lookup(url));
             }
         };
-
         cache.getListenable().addListener(cacheListener);
+        cacheWatchers.putIfAbsent(providerPath, new CacheWatcher(url, notifier));
     }
 
     @Override
     public List<URL> lookup(URL url) {
-        Set<URL> providers = new HashSet<>();
+        List<URL> providers = new ArrayList<>();
         String providerPath = toServicePath(url) + PATH_SEPARATOR + ProtocolProperty.PROVIDER;
         List<String> children = null;
         try {
-            children = client.getChildren().forPath(providerPath);
-        } catch (KeeperException.NoNodeException ignored) {
+            if (client.checkExists().forPath(providerPath) != null) {
+                children = client.getChildren().forPath(providerPath);
+            }
         }catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (children == null) {
-            return null;
+            logger.error("lookup failed! cause %s", e.getMessage());
         }
         for (String s : children) {
-            providers.add(URL.fromString(Objects.requireNonNull(doGetContent(providerPath + PATH_SEPARATOR + s))));
+            String content = doGetContent(providerPath + PATH_SEPARATOR + s);
+            if (!StringUtils.isEmpty(content)){
+                providers.add(URL.fromString(content));
+            }
         }
-        return new ArrayList<>(providers);
+        return providers;
     }
 
     @Override
     protected void doConnect() {
         URL url = getUrl();
-        try {
-            int timeout = url.getParam(ProtocolProperty.TIMEOUT, DEFAULT_CONNECTION_TIMEOUT_MS);
-            int sessionExpireMs = url.getParam(ZK_SESSION_EXPIRE_KEY, DEFAULT_SESSION_TIMEOUT_MS);
-            int retryTimes = url.getParam(ProtocolProperty.RETRIES, 1);
-            CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-                    .connectString(url.getHost()+":"+url.getPort())
-                    .retryPolicy(new RetryNTimes(retryTimes, 1000))
-                    .connectionTimeoutMs(timeout)
-                    .sessionTimeoutMs(sessionExpireMs);
-            String username = url.getParam(ProtocolProperty.USERNAME, "");
-            String password = url.getParam(ProtocolProperty.PASSWORD, "");
-            if ((!StringUtils.isEmpty(username))&&(!StringUtils.isEmpty(password))) {
-                String authority = username + ":" + password;
-                builder = builder.authorization("digest", authority.getBytes());
-            }
-            client = builder.build();
-            client.start();
-            boolean connected = client.blockUntilConnected(timeout, TimeUnit.MILLISECONDS);
-            if (!connected) {
-                throw new IllegalStateException("zookeeper not connected");
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+        int timeout = url.getParam(ProtocolProperty.TIMEOUT, DEFAULT_CONNECTION_TIMEOUT_MS);
+        int sessionExpireMs = url.getParam(ZK_SESSION_EXPIRE_KEY, DEFAULT_SESSION_TIMEOUT_MS);
+        int retryTimes = url.getParam(ProtocolProperty.RETRIES, 3);
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
+                .connectString(url.getParam(ProtocolProperty.ADDRESS, DEFAULT_ADDRESS))
+                .retryPolicy(new RetryNTimes(retryTimes, 1000))
+                .connectionTimeoutMs(timeout)
+                .sessionTimeoutMs(sessionExpireMs);
+        String username = url.getParam(ProtocolProperty.USERNAME);
+        String password = url.getParam(ProtocolProperty.PASSWORD);
+        if (username != null && password != null) {
+            String authority = username + ":" + password;
+            builder = builder.authorization("digest", authority.getBytes());
         }
+        client = builder.build();
+        client.start();
+        client.getConnectionStateListenable().addListener((client, newState) -> {
+            if (newState.isConnected()) {
+                available = true;
+                recover();
+            } else if (!destroyed.get()) {
+                available = false;
+                try {
+                    client.blockUntilConnected(retryTimes, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        });
+    }
+
+    private void recover() {
+        cacheNodes.values().forEach(this::register);
+        cacheWatchers.values().forEach(watcher -> subscribe(watcher.getUrl(), watcher.getNotifier()));
     }
 
     @Override
@@ -137,30 +154,31 @@ public class ZookeeperRegistry extends AbstractRegistry {
         client.close();
     }
 
-    private void createParentPath(String path) {
-        int i = path.lastIndexOf('/');
-        if (i > 0) {
-            createParentPath(path.substring(0, i));
-        }
-        createPersistent(path);
-    }
 
+    /**
+     * 创建永久节点
+     * @param path
+     */
     private void createPersistent(String path) {
         try {
-            client.create().forPath(path);
-        } catch (KeeperException.NodeExistsException e) {
-            // ignore it
+            client.create().creatingParentsIfNeeded().forPath(path);
+        } catch (KeeperException.NodeExistsException ignored) {
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
+    /**
+     * 创建临时节点
+     * @param path
+     * @param data
+     */
     private void createEphemeral(String path, String data) {
         byte[] dataBytes = data.getBytes(CHARSET);
         try {
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(path, dataBytes);
+            client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, dataBytes);
         } catch (KeeperException.NodeExistsException e) {
-            logger.warn("ZNode " + path + " already exists, we just delete is and recreate", e);
+            logger.warn("ZNode " + path + " already exists, we will delete it and recreate", e);
             deletePath(path);
             createEphemeral(path, data);
         } catch (Exception e) {
@@ -168,6 +186,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
         }
     }
 
+    /**
+     *删除目标目录
+     * @param path
+     */
     private void deletePath(String path) {
         try {
             client.delete().deletingChildrenIfNeeded().forPath(path);
@@ -178,6 +200,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
 
+    /**
+     *获取指定path下的数据
+     * @param path
+     * @return
+     */
     private String doGetContent(String path) {
         try {
             byte[] dataBytes = client.getData().forPath(path);
@@ -190,16 +217,48 @@ public class ZookeeperRegistry extends AbstractRegistry {
         return null;
     }
 
+    /**
+     *将url转换为其接口代表的目录
+     * @param url
+     * @return
+     */
     private String toServicePath(URL url) {
         return PATH_SEPARATOR + url.getParam(ProtocolProperty.GROUP, root) + PATH_SEPARATOR + url.getServiceName();
     }
 
+    /**
+     *将url转化为最后节点的父目录
+     * @param url
+     * @return
+     */
     private String toParentPath(URL url) {
         return toServicePath(url) + PATH_SEPARATOR + url.getProtocol();
     }
 
+    /**
+     *将url转化为完整的path
+     * @param url
+     * @return
+     */
     private String toPath(URL url) {
         return toParentPath(url) + PATH_SEPARATOR + URL.encode(url.toPath());
     }
 
+    class CacheWatcher {
+        private URL url;
+        private Notifier notifier;
+
+        CacheWatcher(URL url, Notifier notifier) {
+            this.url = url;
+            this.notifier = notifier;
+        }
+
+        URL getUrl() {
+            return url;
+        }
+
+        Notifier getNotifier() {
+            return notifier;
+        }
+    }
 }
