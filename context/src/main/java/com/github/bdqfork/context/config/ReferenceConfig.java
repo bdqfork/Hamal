@@ -1,4 +1,4 @@
-package com.github.bdqfork.rpc.config;
+package com.github.bdqfork.context.config;
 
 import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;

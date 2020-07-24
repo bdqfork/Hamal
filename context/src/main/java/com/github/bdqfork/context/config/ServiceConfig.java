@@ -1,9 +1,8 @@
-package com.github.bdqfork.rpc.config;
+package com.github.bdqfork.context.config;
 
 import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.core.util.StringUtils;
-import com.github.bdqfork.rpc.annotation.Service;
 
 /**
  * 服务提供者配置类
@@ -36,14 +35,6 @@ public class ServiceConfig<T> {
      * 端口
      */
     private Integer port;
-
-    @SuppressWarnings("unchecked")
-    public ServiceConfig(Service service) {
-        this.group = service.group();
-        this.timeout = service.timeout();
-        this.version = service.version();
-        this.serviceInterface = (Class<T>) service.serviceInterface();
-    }
 
     public ServiceConfig(Class<T> serviceInterface) {
         this.serviceInterface = serviceInterface;

@@ -1,8 +1,7 @@
-package com.github.bdqfork.rpc.config;
+package com.github.bdqfork.context.config;
 
 import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
-import com.github.bdqfork.rpc.annotation.Application;
 
 /**
  * 应用配置类
@@ -43,17 +42,6 @@ public class ApplicationConfig {
      * service容器类型
      */
     private String container;
-
-    public ApplicationConfig(Application application) {
-        this.host = application.host();
-        this.port = application.port();
-        this.protocol = application.protocol();
-        this.server = application.server();
-        this.serilizer = application.serilizer();
-        this.direct = application.direct();
-        this.loadbalancer = application.loadbalancer();
-        this.container = application.container();
-    }
 
     public ApplicationConfig(String host, Integer port, String protocol, String server) {
         this.host = host;

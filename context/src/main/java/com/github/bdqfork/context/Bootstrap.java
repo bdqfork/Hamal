@@ -5,15 +5,12 @@ import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.core.exception.ConfilictServiceException;
 import com.github.bdqfork.core.extension.ExtensionLoader;
-import com.github.bdqfork.core.util.AnnotationUtils;
 import com.github.bdqfork.rpc.Invoker;
 import com.github.bdqfork.rpc.InvokerFactory;
-import com.github.bdqfork.rpc.annotation.Application;
-import com.github.bdqfork.rpc.annotation.Service;
-import com.github.bdqfork.rpc.config.ApplicationConfig;
-import com.github.bdqfork.rpc.config.ReferenceConfig;
-import com.github.bdqfork.rpc.config.RegistryConfig;
-import com.github.bdqfork.rpc.config.ServiceConfig;
+import com.github.bdqfork.context.config.ApplicationConfig;
+import com.github.bdqfork.context.config.ReferenceConfig;
+import com.github.bdqfork.context.config.RegistryConfig;
+import com.github.bdqfork.context.config.ServiceConfig;
 import com.github.bdqfork.rpc.container.ServiceContainer;
 import com.github.bdqfork.rpc.protocol.Protocol;
 import com.github.bdqfork.rpc.registry.exporter.Exporter;
@@ -24,25 +21,27 @@ import org.slf4j.LoggerFactory;
  * @author bdq
  * @since 2020/2/27
  */
-public class ContextManager {
-    private static final Logger log = LoggerFactory.getLogger(ContextManager.class);
+public class Bootstrap {
+    private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
     private Protocol protocol;
     private ApplicationConfig applicationConfig;
     private ServiceContainer serviceContainer;
     private Exporter exporter;
 
-    public ContextManager(ApplicationConfig applicationConfig) {
-        init(applicationConfig);
+    public Bootstrap(ApplicationConfig applicationConfig) {
+        this(applicationConfig, null);
     }
 
-    public ContextManager(ApplicationConfig applicationConfig ,RegistryConfig registryConfig) {
+    public Bootstrap(ApplicationConfig applicationConfig, RegistryConfig registryConfig) {
         init(applicationConfig);
-        URL exportUrl = new URL(ProtocolProperty.EXPORTER, "127.0.0.1", 0, "rpc");
-        exportUrl.addParam(ProtocolProperty.REGISTRY, registryConfig.toURL());
-        this.exporter = protocol.export(exportUrl);
+        if (registryConfig != null) {
+            URL exportUrl = new URL(ProtocolProperty.EXPORTER, "127.0.0.1", 0, "rpc");
+            exportUrl.addParam(ProtocolProperty.REGISTRY, registryConfig.toURL());
+            this.exporter = protocol.export(exportUrl);
+        }
     }
 
-    public void init(ApplicationConfig applicationConfig) {
+    private void init(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
         this.protocol = ExtensionLoader.getExtensionLoader(Protocol.class)
                 .getExtension(applicationConfig.getProtocol());
@@ -90,13 +89,6 @@ public class ContextManager {
         return InvokerFactory.getProxy(invoker);
     }
 
-    public <T> void registerService(T instance) {
-        Service service = AnnotationUtils.getMergedAnnotation(instance.getClass(), Service.class);
-        assert service != null;
-        ServiceConfig<T> serviceConfig = new ServiceConfig<>(service);
-        registerService(instance, serviceConfig);
-    }
-
     public <T> void registerService(T instance, ServiceConfig<T> serviceConfig) {
         serviceConfig.setHost(applicationConfig.getHost());
         serviceConfig.setPort(applicationConfig.getPort());
@@ -118,10 +110,4 @@ public class ContextManager {
         }
     }
 
-    public static ContextManager build(Class<?> clazz) {
-        Application application = AnnotationUtils.getMergedAnnotation(clazz, Application.class);
-        assert application != null;
-        ApplicationConfig applicationConfig = new ApplicationConfig(application);
-        return new ContextManager(applicationConfig);
-    }
 }
