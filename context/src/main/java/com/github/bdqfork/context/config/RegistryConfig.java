@@ -4,8 +4,6 @@ import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.core.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 注册中心配置类
@@ -15,21 +13,40 @@ import java.util.Map;
 public class RegistryConfig {
 
 
-    String host;
+    private String host;
 
-    Integer port;
+    private Integer port;
 
-    String type;
+    /**
+     * 注册中心类型，支持zookeeper
+     */
+    private String type;
 
-    Map<String, Integer> addresses = new HashMap<>();
+    /**
+     * 注册中心地址，格式：地址+":"+端口
+     * 如果有多个地址则用";"隔开
+     */
+    private String addresses;
 
-    String username;
+    /**
+     * 注册中心用户名
+     */
+    private String username;
 
-    String password;
+    /**
+     * 注册中心密码
+     */
+    private String password;
 
-    Integer timeout;
+    /**
+     * 超时时间
+     */
+    private Integer timeout;
 
-    Integer retryTime;
+    /**
+     * 连接重试次数
+     */
+    private Integer retryTime;
 
     public String getHost() {
         return host;
@@ -55,11 +72,11 @@ public class RegistryConfig {
         this.type = type;
     }
 
-    public Map<String, Integer> getAddresses() {
+    public String getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(Map<String, Integer> addresses) {
+    public void setAddresses(String addresses) {
         this.addresses = addresses;
     }
 
@@ -95,10 +112,11 @@ public class RegistryConfig {
         this.retryTime = retryTime;
     }
 
-    public RegistryConfig(String host, Integer port, String type) {
-        this.host = host;
-        this.port = port;
+    public RegistryConfig(String type, String addressses) {
+        this.host = "127.0.0.1";
+        this.port = 0;
         this.type = type;
+        this.addresses = addressses;
     }
 
     public URL toURL(){
@@ -108,6 +126,9 @@ public class RegistryConfig {
         }
         if (!StringUtils.isEmpty(password)) {
             url.addParam(ProtocolProperty.PASSWORD, password);
+        }
+        if (!StringUtils.isEmpty(addresses)) {
+            url.addParam(ProtocolProperty.ADDRESS, addresses);
         }
         if (timeout != null) {
             url.addParam(ProtocolProperty.TIMEOUT, timeout);

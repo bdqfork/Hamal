@@ -1,9 +1,7 @@
 package com.github.bdqfork.registry;
 
-
 import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
-import com.github.bdqfork.core.exception.RpcException;
 import com.github.bdqfork.core.util.StringUtils;
 import com.github.bdqfork.rpc.registry.AbstractRegistry;
 import com.github.bdqfork.rpc.registry.Notifier;
@@ -30,18 +28,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class ZookeeperRegistry extends AbstractRegistry {
 
-    protected static final Logger logger = LoggerFactory.getLogger(ZookeeperRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(ZookeeperRegistry.class);
     private final static String DEFAULT_ROOT = "rpc";
     private final static String PATH_SEPARATOR = "/";
     private final String root;
-    private static final String ZK_SESSION_EXPIRE_KEY = "zk.session.expire";
-    private static int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
-    private static int DEFAULT_SESSION_TIMEOUT_MS = 60 * 1000;
-    private static final String DEFAULT_ADDRESS = "127.0.0.1:2181";
-    private Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
+    private final static String ZK_SESSION_EXPIRE_KEY = "zk.session.expire";
+    private final static int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
+    private final static int DEFAULT_SESSION_TIMEOUT_MS = 60 * 1000;
+    private final static String DEFAULT_ADDRESS = "127.0.0.1:2181";
+    private final Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
     private Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
     private CuratorFramework client;
-    static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public ZookeeperRegistry(URL url) {
         super(url);
@@ -52,21 +50,26 @@ public class ZookeeperRegistry extends AbstractRegistry {
     public void register(URL url) {
         try {
             createPersistent(toParentPath(url));
-            createEphemeral(toPath(url), url.toPath());
-            cacheNodes.putIfAbsent(toPath(url), url);
-        } catch (Throwable e) {
-            new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e).printStackTrace();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
+        try {
+            createEphemeral(toPath(url), url.toPath());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        cacheNodes.putIfAbsent(toPath(url), url);
     }
 
     @Override
     public void undoRegister(URL url) {
+        String path = toPath(url);
         try {
-            deletePath(toPath(url));
-            cacheNodes.remove(toPath(url));
-        } catch (Throwable e) {
-            new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e).printStackTrace();
+            deletePath(path);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
+        cacheNodes.remove(toPath(url));
     }
 
     @Override
@@ -77,7 +80,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
         try {
             cache.start();
         } catch (Exception e) {
-            logger.error("PathChildrenCache start failed! cause %s", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("PathChildrenCache start failed!", e.getCause());
+            }
+            throw new IllegalStateException(e);
         }
         PathChildrenCacheListener cacheListener = (c, event) -> {
             PathChildrenCacheEvent.Type type = event.getType();
@@ -99,7 +105,13 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 children = client.getChildren().forPath(providerPath);
             }
         }catch (Exception e) {
-            logger.error("lookup failed! cause %s", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("lookup failed! cause", e.getCause());
+            }
+            throw new IllegalStateException(e);
+        }
+        if (children == null) {
+            return providers;
         }
         for (String s : children) {
             String content = doGetContent(providerPath + PATH_SEPARATOR + s);
@@ -116,8 +128,9 @@ public class ZookeeperRegistry extends AbstractRegistry {
         int timeout = url.getParam(ProtocolProperty.TIMEOUT, DEFAULT_CONNECTION_TIMEOUT_MS);
         int sessionExpireMs = url.getParam(ZK_SESSION_EXPIRE_KEY, DEFAULT_SESSION_TIMEOUT_MS);
         int retryTimes = url.getParam(ProtocolProperty.RETRIES, 3);
+        String addresses = url.getParam(ProtocolProperty.ADDRESS, DEFAULT_ADDRESS).replace(';', ',');
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-                .connectString(url.getParam(ProtocolProperty.ADDRESS, DEFAULT_ADDRESS))
+                .connectString(addresses)
                 .retryPolicy(new RetryNTimes(retryTimes, 1000))
                 .connectionTimeoutMs(timeout)
                 .sessionTimeoutMs(sessionExpireMs);
@@ -138,7 +151,9 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 try {
                     client.blockUntilConnected(retryTimes, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    logger.error(e.getMessage(), e);
+                    if (log.isErrorEnabled()) {
+                        log.error(e.getMessage(), e);
+                    }
                 }
             }
         });
@@ -157,70 +172,69 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
     /**
      * 创建永久节点
-     * @param path
+     * @param path 节点路径
      */
-    private void createPersistent(String path) {
+    private void createPersistent(String path) throws Exception{
         try {
             client.create().creatingParentsIfNeeded().forPath(path);
         } catch (KeeperException.NodeExistsException ignored) {
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            //节点如已存在，忽略异常
         }
     }
 
     /**
      * 创建临时节点
-     * @param path
-     * @param data
+     * @param path 节点路径
+     * @param data 节点数据
      */
-    private void createEphemeral(String path, String data) {
+    private void createEphemeral(String path, String data) throws Exception{
         byte[] dataBytes = data.getBytes(CHARSET);
         try {
             client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, dataBytes);
         } catch (KeeperException.NodeExistsException e) {
-            logger.warn("ZNode " + path + " already exists, we will delete it and recreate", e);
+            if (log.isWarnEnabled()) {
+                log.warn("ZNode " + path + " already exists, we will delete it and recreate", e);
+            }
             deletePath(path);
             createEphemeral(path, data);
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
     /**
      *删除目标目录
-     * @param path
+     * @param path 节点路径
      */
-    private void deletePath(String path) {
+    private void deletePath(String path) throws Exception{
         try {
             client.delete().deletingChildrenIfNeeded().forPath(path);
         } catch (KeeperException.NoNodeException ignored) {
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            //节点已删除，忽略
         }
     }
 
 
     /**
      *获取指定path下的数据
-     * @param path
-     * @return
+     * @param path 节点路径
+     * @return 节点数据
      */
     private String doGetContent(String path) {
+        byte[] dataBytes;
         try {
-            byte[] dataBytes = client.getData().forPath(path);
-            return (dataBytes == null || dataBytes.length == 0) ? null : new String(dataBytes, CHARSET);
-        } catch (KeeperException.NoNodeException e) {
-            // ignore NoNode Exception.
+            dataBytes = client.getData().forPath(path);
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            if (log.isErrorEnabled()) {
+                log.error(e.getMessage(), e.getCause());
+            }
+            return null;
         }
-        return null;
+        return (dataBytes == null || dataBytes.length == 0) ? null : new String(dataBytes, CHARSET);
     }
 
     /**
      *将url转换为其接口代表的目录
-     * @param url
-     * @return
+     * @param url service url
+     * @return path for service interface
      */
     private String toServicePath(URL url) {
         return PATH_SEPARATOR + url.getParam(ProtocolProperty.GROUP, root) + PATH_SEPARATOR + url.getServiceName();
@@ -228,8 +242,8 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
     /**
      *将url转化为最后节点的父目录
-     * @param url
-     * @return
+     * @param url service url
+     * @return service parent path
      */
     private String toParentPath(URL url) {
         return toServicePath(url) + PATH_SEPARATOR + url.getProtocol();
@@ -237,16 +251,16 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
     /**
      *将url转化为完整的path
-     * @param url
-     * @return
+     * @param url service url
+     * @return service path
      */
     private String toPath(URL url) {
         return toParentPath(url) + PATH_SEPARATOR + URL.encode(url.toPath());
     }
 
-    class CacheWatcher {
-        private URL url;
-        private Notifier notifier;
+    private class CacheWatcher {
+        private final URL url;
+        private final Notifier notifier;
 
         CacheWatcher(URL url, Notifier notifier) {
             this.url = url;
