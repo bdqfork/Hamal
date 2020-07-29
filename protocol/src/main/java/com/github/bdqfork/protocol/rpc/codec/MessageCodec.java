@@ -19,9 +19,10 @@ import java.util.List;
  * @since 2020/2/25
  */
 public class MessageCodec extends ByteToMessageCodec<Serializable> {
+    private static final byte MAGIC = 0x66;
     private static final byte REQUEST = 0;
     private static final byte RESPONSE = 1;
-    private Serializer serializer;
+    private final Serializer serializer;
 
     public MessageCodec(Serializer serializer) {
         this.serializer = serializer;
@@ -29,7 +30,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
-        out.writeByte(0x66);
+        out.writeByte(MAGIC);
         if (msg instanceof Request) {
             Request request = (Request) msg;
             doEncode(out, (Serializable) request.getPayload(), REQUEST, request.getId(),
@@ -70,7 +71,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
             Request request = new Request(id);
             request.setStatus(status);
             request.setEvent(event);
-            MethodInvocation methodInvocation = serializer.deserialize(body, MethodInvocation.class);
+            MethodInvocation methodInvocation = decodeMethodInvocation(body);
             request.setPayload(methodInvocation);
             out.add(request);
         }
@@ -82,5 +83,9 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
             response.setPayload(result);
             out.add(response);
         }
+    }
+
+    private MethodInvocation decodeMethodInvocation(byte[] body) throws SerializerException {
+        return serializer.deserialize(body, MethodInvocation.class);
     }
 }
