@@ -23,7 +23,7 @@ import java.util.List;
 public class MessageCodec extends ByteToMessageCodec<Serializable> {
     private static final byte REQUEST = 0;
     private static final byte RESPONSE = 1;
-    private Serializer serializer;
+    private final Serializer serializer;
 
     public MessageCodec(Serializer serializer) {
         this.serializer = serializer;
