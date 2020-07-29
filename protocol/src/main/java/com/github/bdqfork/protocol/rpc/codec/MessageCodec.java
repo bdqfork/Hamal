@@ -2,6 +2,7 @@ package com.github.bdqfork.protocol.rpc.codec;
 
 import com.github.bdqfork.core.exception.SerializerException;
 import com.github.bdqfork.core.exception.UnknownPacketException;
+import com.github.bdqfork.core.serializer.JsonSerializer;
 import com.github.bdqfork.core.serializer.Serializer;
 import com.github.bdqfork.rpc.MethodInvocation;
 import com.github.bdqfork.rpc.protocol.Request;
@@ -12,6 +13,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -19,10 +21,9 @@ import java.util.List;
  * @since 2020/2/25
  */
 public class MessageCodec extends ByteToMessageCodec<Serializable> {
-    private static final byte MAGIC = 0x66;
     private static final byte REQUEST = 0;
     private static final byte RESPONSE = 1;
-    private final Serializer serializer;
+    private Serializer serializer;
 
     public MessageCodec(Serializer serializer) {
         this.serializer = serializer;
@@ -30,7 +31,7 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
-        out.writeByte(MAGIC);
+        out.writeByte(0x66);
         if (msg instanceof Request) {
             Request request = (Request) msg;
             doEncode(out, (Serializable) request.getPayload(), REQUEST, request.getId(),
@@ -79,13 +80,35 @@ public class MessageCodec extends ByteToMessageCodec<Serializable> {
             Response response = new Response(id);
             response.setStatus(status);
             response.setEvent(event);
-            Object result = serializer.deserialize(body, Result.class);
+            Result result = decodeResult(body);
             response.setPayload(result);
             out.add(response);
         }
     }
 
     private MethodInvocation decodeMethodInvocation(byte[] body) throws SerializerException {
-        return serializer.deserialize(body, MethodInvocation.class);
+        MethodInvocation methodInvocation = serializer.deserialize(body, MethodInvocation.class);
+        if (serializer instanceof JsonSerializer) {
+            Class<?>[] argType = methodInvocation.getArgumentTypes();
+            Object[] args = methodInvocation.getArguments();
+            for (int i = 0; i < argType.length; i++) {
+                byte[] serialize = serializer.serialize((Serializable) args[i]);
+                args[i] = serializer.deserialize(serialize, argType[i]);
+            }
+        }
+        return methodInvocation;
+    }
+
+    private Result decodeResult(byte[] body) throws SerializerException {
+        Result res = serializer.deserialize(body, Result.class);
+        if (serializer instanceof JsonSerializer) {
+            Object data = res.getData();
+            if (data instanceof LinkedHashMap) {
+                Class<?> returnType = res.getDateType();
+                byte[] serialize = serializer.serialize((Serializable) data);
+                res.setData(serializer.deserialize(serialize, returnType));
+            }
+        }
+        return res;
     }
 }
