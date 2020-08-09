@@ -1,1 +1,2 @@
 rpc=com.github.bdqfork.protocol.rpc.client.NettyClientFactory
+http=com.github.bdqfork.protocol.http.client.HttpClientFactory

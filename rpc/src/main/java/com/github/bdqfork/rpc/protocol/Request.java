@@ -35,6 +35,8 @@ public class Request implements Serializable {
      */
     private Object payload;
 
+    public Request() {}
+
     public Request(Long id) {
         this.id = id;
     }

@@ -30,6 +30,8 @@ public class Response implements Serializable {
      */
     private Object payload;
 
+    public Response(){}
+
     public Response(Long id) {
         this.id = id;
     }

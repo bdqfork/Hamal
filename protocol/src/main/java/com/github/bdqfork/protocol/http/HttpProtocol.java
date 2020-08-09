@@ -1,8 +1,10 @@
 package com.github.bdqfork.protocol.http;
 
 import com.github.bdqfork.core.URL;
+import com.github.bdqfork.protocol.http.server.HttpServer;
 import com.github.bdqfork.rpc.Invoker;
 import com.github.bdqfork.rpc.protocol.AbstractProtocol;
+import com.github.bdqfork.rpc.protocol.client.ClusterInvoker;
 import com.github.bdqfork.rpc.protocol.server.RpcServer;
 
 /**
@@ -12,11 +14,11 @@ import com.github.bdqfork.rpc.protocol.server.RpcServer;
 public class HttpProtocol extends AbstractProtocol {
     @Override
     protected RpcServer createServer(URL url) {
-        return null;
+        return new HttpServer(url);
     }
 
     @Override
     protected <T> Invoker<T> doRefer(Class<T> serviceInterface, URL url) {
-        return null;
+        return new ClusterInvoker<>(serviceInterface, url);
     }
 }
