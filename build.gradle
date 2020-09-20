@@ -10,7 +10,8 @@ ext {
             jackson  : '2.10.2',
             curator  : '4.2.0',
             netty    : '4.1.45.Final',
-            junit    : '5.6.0'
+            junit    : '5.6.0',
+            beanutils: '1.9.3'
     ]
 }
 allprojects {
@@ -68,7 +69,7 @@ subprojects {
                     username hasProperty('ossrh_key') ? ossrh_key : ''
                     password hasProperty('ossrh_pass') ? ossrh_pass : ''
                 }
-                    
+
             }
         }
     }

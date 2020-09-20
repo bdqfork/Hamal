@@ -1,1 +1,2 @@
 rpc=com.github.bdqfork.protocol.rpc.RpcProtocol
+http=com.github.bdqfork.protocol.http.HttpProtocol

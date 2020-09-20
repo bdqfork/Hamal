@@ -1,1 +1,2 @@
 hessian=com.github.bdqfork.core.serializer.HessianSerializer
+json=com.github.bdqfork.core.serializer.JsonSerializer

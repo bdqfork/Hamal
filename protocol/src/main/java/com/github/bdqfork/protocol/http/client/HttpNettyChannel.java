@@ -1,10 +1,11 @@
-package com.github.bdqfork.protocol.rpc.client;
+package com.github.bdqfork.protocol.http.client;
 
 import com.github.bdqfork.core.URL;
 import com.github.bdqfork.core.constant.ProtocolProperty;
 import com.github.bdqfork.core.exception.RemoteException;
 import com.github.bdqfork.core.exception.RpcException;
-import com.github.bdqfork.protocol.rpc.codec.MessageCodec;
+import com.github.bdqfork.protocol.http.codec.HttpMessageCodec;
+import com.github.bdqfork.protocol.rpc.client.ResponseHandler;
 import com.github.bdqfork.rpc.DefaultFuture;
 import com.github.bdqfork.rpc.protocol.Request;
 import com.github.bdqfork.rpc.RpcContext;
@@ -14,24 +15,26 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Future;
 
 /**
- * @author bdq
- * @since 2020/2/25
+ * @author h-l-j
+ * @since 2020/8/9
  */
-public class NettyChannel extends AbstractChannel {
-    private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
+public class HttpNettyChannel extends AbstractChannel {
+    private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
     private volatile Channel channel;
     private long timeout;
     private Bootstrap bootstrap;
     private EventLoopGroup workerGroup;
 
-    public NettyChannel(URL url) {
+    public HttpNettyChannel(URL url) {
         super(url);
         timeout = url.getParam(ProtocolProperty.TIMEOUT, 1000L);
         workerGroup = new NioEventLoopGroup(1);
@@ -43,9 +46,10 @@ public class NettyChannel extends AbstractChannel {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4, 14, 0))
-                                .addLast(new MessageCodec(serializer))
-                                .addLast(new ResponseHandler());
+                            .addLast(new HttpClientCodec())
+                            .addLast(new HttpObjectAggregator(1048576))
+                            .addLast(new HttpMessageCodec(serializer))
+                            .addLast(new ResponseHandler());
                     }
                 });
     }

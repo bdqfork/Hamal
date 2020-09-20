@@ -10,6 +10,7 @@ dependencies {
 
     implementation "org.javassist:javassist:${libs.javassist}"
     implementation "com.caucho:hessian:${libs.hessian}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${libs.jackson}"
 
     testImplementation "org.junit.jupiter:junit-jupiter:${libs.junit}"
 }

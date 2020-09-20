@@ -5,6 +5,7 @@ targetCompatibility = '1.8'
 
 dependencies {
     api project(":protocol")
+    api project(":registry")
 }
 
 task sourcesJar(type: Jar) {

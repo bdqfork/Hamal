@@ -1,9 +1,14 @@
 package com.github.bdqfork.core;
 
+import com.github.bdqfork.core.util.StringUtils;
+
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * rpc://10.20.153.10:1234/barService?param=value
@@ -55,6 +60,10 @@ public class URL implements Serializable {
 
     @SuppressWarnings("unchecked")
     public <T> T getParam(String key, T defaultValue) {
+        Object value = params.get(key);
+        if ((defaultValue instanceof Long || defaultValue instanceof Integer) && value instanceof String) {
+            return (T) Long.valueOf((String) value);
+        }
         return (T) params.getOrDefault(key, defaultValue);
     }
 
@@ -120,6 +129,9 @@ public class URL implements Serializable {
 
         URL url = new URL(protocol, hostAndPort[0], Integer.valueOf(hostAndPort[1]), serviceName);
 
+        if (serviceStr.length < 2) {
+            return url;
+        }
         String paramStr = serviceStr[1];
         String[] params = paramStr.split("&");
 
@@ -128,5 +140,29 @@ public class URL implements Serializable {
             url.addParam(pairs[0], pairs[1]);
         }
         return url;
+    }
+
+    public static String encode(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        String url = ((URL)o).toPath();
+        return url.equals(toPath());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(protocol, host, port, serviceName, params);
     }
 }

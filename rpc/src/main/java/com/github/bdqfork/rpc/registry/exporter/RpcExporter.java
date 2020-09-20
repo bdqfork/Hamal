@@ -31,7 +31,7 @@ public class RpcExporter implements Exporter {
 
     private void initRegistry(URL url) {
         RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getDefaultExtension();
-        this.registry = registryFactory.getRegistry(URL.fromString(url.getParam(ProtocolProperty.REGISTRY)));
+        this.registry = registryFactory.getRegistry(url.getParam(ProtocolProperty.REGISTRY));
     }
 
     @Override

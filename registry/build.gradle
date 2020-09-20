@@ -3,8 +3,14 @@ apply plugin: 'java-library'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+def libs = rootProject.ext.libraries
+
 dependencies {
+    implementation "org.apache.curator:curator-recipes:${libs.curator}"
     implementation project(":rpc")
+
+    testImplementation "org.junit.jupiter:junit-jupiter:${libs.junit}"
+    testImplementation "org.apache.curator:curator-test:${libs.curator}"
 }
 
 task sourcesJar(type: Jar) {
